@@ -29,6 +29,7 @@
 #include <esp_wifi.h>
 // #include <esp_event_loop.h>
 #include <esp_event.h>
+#include <esp_netif.h>
 #include <esp_log.h>
 #include <esp_system.h>
 #include <esp_http_server.h>
@@ -40,8 +41,10 @@
 #include <freertos/task.h>
 #include <freertos/event_groups.h>
 #include <stdlib.h>
+#include <string.h>
 #include "lwip/err.h"
 #include "lwip/sys.h"
+#include "lwip/ip4_addr.h"
 #include "esp_mac.h"
 #include <Esp_mad.h>
 #include <Esp_mad_Globals_Variables.h>
@@ -72,6 +75,8 @@ extern const uint8_t jquery_3_3_1_min_js_start[] asm("_binary_jquery_3_3_1_min_j
 extern const uint8_t jquery_3_3_1_min_js_end[] asm("_binary_jquery_3_3_1_min_js_end");
 
 static const char *TAG = "Esp_Server->";
+static httpd_handle_t s_http_server = NULL;
+static esp_netif_t *s_ap_netif = NULL;
 
 /**
  *	@fn 	    esp_err_t main_page_get_handler (httpd_req_t *req)
@@ -555,6 +560,11 @@ static void wifi_event_handler(void *ctx, esp_event_base_t event_base,
 
     httpd_handle_t *server = (httpd_handle_t *)ctx;
 
+    if (event_base != WIFI_EVENT || server == NULL)
+    {
+        return;
+    }
+
     switch (event_id)
     {
 
@@ -667,7 +677,26 @@ static void initialise_wifi_in_ap(void)
 
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
-    esp_netif_create_default_wifi_ap();
+
+    if (s_ap_netif == NULL)
+    {
+        s_ap_netif = esp_netif_create_default_wifi_ap();
+        ESP_ERROR_CHECK(s_ap_netif ? ESP_OK : ESP_FAIL);
+    }
+
+    esp_netif_ip_info_t ip_info;
+    memset(&ip_info, 0, sizeof(ip_info));
+    IP4_ADDR(&ip_info.ip, 192, 168, 1, 1);
+    IP4_ADDR(&ip_info.gw, 192, 168, 1, 1);
+    IP4_ADDR(&ip_info.netmask, 255, 255, 255, 0);
+
+    esp_err_t dhcps_ret = esp_netif_dhcps_stop(s_ap_netif);
+    if (dhcps_ret != ESP_ERR_ESP_NETIF_DHCP_ALREADY_STOPPED)
+    {
+        ESP_ERROR_CHECK(dhcps_ret);
+    }
+    ESP_ERROR_CHECK(esp_netif_set_ip_info(s_ap_netif, &ip_info));
+    ESP_ERROR_CHECK(esp_netif_dhcps_start(s_ap_netif));
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
@@ -677,7 +706,7 @@ static void initialise_wifi_in_ap(void)
     ESP_ERROR_CHECK(esp_event_handler_instance_register(WIFI_EVENT,
                                                         ESP_EVENT_ANY_ID,
                                                         &wifi_event_handler,
-                                                        NULL,
+                                                        &s_http_server,
                                                         NULL));
 
     wifi_config_t wifi_config = {

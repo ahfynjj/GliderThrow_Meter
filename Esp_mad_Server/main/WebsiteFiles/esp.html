@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="fr">
+<html lang="zh-CN">
 
     <head>
   
@@ -13,7 +13,7 @@
         <script src="jquery-3.3.1.min.js"></script>       
         <script src="bootstrap.min.js"></script>  
                      
-        <title>ANEG Glider Throw</title>
+        <title>ANEG 舵面量角器</title>
 
     </head>
 
@@ -22,7 +22,7 @@
         <!-- A nice jumbotron for the page header -->
         <div class="col-lg-12">
             <div class="jumbotron">
-                <h1 style="font-size:100px">Glider Throw</h1><span style="font-size:50px">The simplest way to setup your Glider</span>
+                <h1 style="font-size:100px">舵面量角器</h1><span style="font-size:50px">最简单的滑翔机调参方式</span>
             </div>
         </div>
 
@@ -30,10 +30,10 @@
         <div class="col-lg-12">    
             <nav class="navbar navbar-default" style="font-size:50px">
                 <ul class="nav nav-tabs">
-                    <li><a class="nav-item nav-link active" href="#p1" data-toggle="tab">Travel</a></li>
-                    <li><a class="nav-item nav-link" href="#p2" data-toggle="tab">Angle</a></li>
-                    <li><a class="nav-item nav-link" href="#p3" data-toggle="tab">Setting</a></li>
-                    <li><a class="nav-item nav-link" href="#p4" data-toggle="tab">Info</a></li>
+                    <li><a class="nav-item nav-link active" href="#p1" data-toggle="tab">行程</a></li>
+                    <li><a class="nav-item nav-link" href="#p2" data-toggle="tab">角度</a></li>
+                    <li><a class="nav-item nav-link" href="#p3" data-toggle="tab">设置</a></li>
+                    <li><a class="nav-item nav-link" href="#p4" data-toggle="tab">信息</a></li>
                 </ul>
             </nav>      
         </div>
@@ -45,27 +45,27 @@
 
                 <div class="col-lg-12">                
                     <div style="background:linear-gradient(to right, #8f8e8e 0%,#706464 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">Sensor 1</p>
+                        <p class="text-center" style="color:white;font-size:50px">传感器 1</p>
                     </div>
                 </div>             
 
                 <div class="col-lg-12">                
                     <div style="background:linear-gradient(to right, #ff5db1 0%,#ef017c 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">Travel : &nbsp;<span id="travel1" name="travel1"></span>
+                        <p class="text-center" style="color:white;font-size:50px">行程：&nbsp;<span id="travel1" name="travel1"></span>
                         mm</p>
                     </div>
                 </div>
 
                 <div class="col-lg-12" >
                     <div style="background:linear-gradient(to right, #ff5db1 0%,#ef017c 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">Maximum Up: &nbsp;<span id="maxiTravelSensor1" name="maxiTravelSensor1"></span>
+                        <p class="text-center" style="color:white;font-size:50px">最大上偏：&nbsp;<span id="maxiTravelSensor1" name="maxiTravelSensor1"></span>
                         mm</p>
                     </div>
                 </div>          
                 
                 <div class="col-lg-12" >
                     <div style="background:linear-gradient(to right, #ff5db1 0%,#ef017c 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">Maximum Down : &nbsp;<span id="miniTravelSensor1" name="miniTravelSensor1"></span>
+                        <p class="text-center" style="color:white;font-size:50px">最大下偏：&nbsp;<span id="miniTravelSensor1" name="miniTravelSensor1"></span>
                         mm</p>
                     </div>
                 </div>   
@@ -74,27 +74,27 @@
 
                 <div class="col-lg-12">                
                     <div style="background:linear-gradient(to right, #8f8e8e 0%,#706464 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">Sensor 2</p>
+                        <p class="text-center" style="color:white;font-size:50px">传感器 2</p>
                     </div>
                 </div>
 
                 <div class="col-lg-12">
                     <div  style="background:linear-gradient(to right, #a9e4f7 0%,#0fb4e7 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">Travel : &nbsp;<span id="travel2" name="travel2"></span>
+                        <p class="text-center" style="color:white;font-size:50px">行程：&nbsp;<span id="travel2" name="travel2"></span>
                         mm</p>             
                     </div>
                 </div>
 
                 <div class="col-lg-12">
                     <div  style="background:linear-gradient(to right, #a9e4f7 0%,#0fb4e7 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">Maximum Up : &nbsp;<span id="maxiTravelSensor2" name="maxiTravelSensor2"></span>
+                        <p class="text-center" style="color:white;font-size:50px">最大上偏：&nbsp;<span id="maxiTravelSensor2" name="maxiTravelSensor2"></span>
                         mm</p>             
                     </div>
                 </div>                
 
                 <div class="col-lg-12">
                     <div  style="background:linear-gradient(to right, #a9e4f7 0%,#0fb4e7 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">Maximum Down : &nbsp;<span id="miniTravelSensor2" name="miniTravelSensor2"></span>
+                        <p class="text-center" style="color:white;font-size:50px">最大下偏：&nbsp;<span id="miniTravelSensor2" name="miniTravelSensor2"></span>
                         mm</p>             
                     </div>
                 </div>     
@@ -103,7 +103,7 @@
 
                 <div class="col-lg-12" >
                     <div style="background:linear-gradient(to right, #5ef59d 0%,#06d606 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">Delta travel : &nbsp;<span id="DeltaTravel" name="DeltaTravel"></span>
+                        <p class="text-center" style="color:white;font-size:50px">行程差值：&nbsp;<span id="DeltaTravel" name="DeltaTravel"></span>
                         mm</p>
                     </div>
                 </div>
@@ -114,7 +114,7 @@
 
                 <div class="col text-center">                                             
                     <button type="button" style="background:linear-gradient(to right, #8f8e8e 0%,#706464 100%);border-radius:10px" 
-                    id="resetSubmit" name="resetSubmit"><p class="text-center" style="color:white;font-size:50px">Reset Maximum(s)</p></button>
+                    id="resetSubmit" name="resetSubmit"><p class="text-center" style="color:white;font-size:50px">重置最大/最小</p></button>
                 </div>
 
             </div>
@@ -124,22 +124,22 @@
 
                 <div class="col-lg-12">
                     <div style="background:linear-gradient(to right, #ff5db1 0%,#ef017c 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">Sensor 1 angle : &nbsp;<span id="angle1" name="angle1"></span>
-                        degr&eacute;s</p>
+                        <p class="text-center" style="color:white;font-size:50px">传感器 1 角度：&nbsp;<span id="angle1" name="angle1"></span>
+                        度</p>
                     </div>
                 </div>
                                 
                 <div class="col-lg-12">
                     <div style="background:linear-gradient(to right, #a9e4f7 0%,#0fb4e7 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">Sensor 2 angle : &nbsp;<span id="angle2" name="angle2"></span>
-                        degr&eacute;s</p>
+                        <p class="text-center" style="color:white;font-size:50px">传感器 2 角度：&nbsp;<span id="angle2" name="angle2"></span>
+                        度</p>
                     </div>
                 </div>
                                 
                 <div class="col-lg-12">               
                     <div style="background:linear-gradient(to right, #5ef59d 0%,#06d606 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">Delta angle : &nbsp;<span id="DeltaAngle" name="DeltaAngle"></span>
-                        degr&eacute;s</p>
+                        <p class="text-center" style="color:white;font-size:50px">角度差值：&nbsp;<span id="DeltaAngle" name="DeltaAngle"></span>
+                        度</p>
                     </div>
                 </div>
                 
@@ -149,7 +149,7 @@
             <div class="tab-pane" id="p3">                
                 <input class="col-lg-12" style="border-radius:10px;font-size:50px" type="number" min="1" step="1" id ="chordValue" name="chordValue" value="50" />
                                 
-                <button class="col-lg-12" style="border-radius:10px;font-size:50px;background-color:#33ff00" id="chordSubmit" name="chordSubmit">Save chord value</button>
+                <button class="col-lg-12" style="border-radius:10px;font-size:50px;background-color:#33ff00" id="chordSubmit" name="chordSubmit">保存舵弦长度</button>
             </div>
             
             <!-- info tab-content -->
@@ -157,14 +157,14 @@
 
                 <div class="col-lg-12">
                     <div style="background:linear-gradient(to right, #ff5db1 0%,#ef017c 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">Sensor 1 Voltage : &nbsp;<span id="voltage1" name="voltage1"></span>
+                        <p class="text-center" style="color:white;font-size:50px">传感器 1 电压：&nbsp;<span id="voltage1" name="voltage1"></span>
                         V</p>
                     </div>
                 </div>
 
                 <div class="col-lg-12">
                     <div style="background:linear-gradient(to right, #a9e4f7 0%,#0fb4e7 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">Sensor 2 Voltage : &nbsp;<span id="voltage2" name="voltage2"></span>
+                        <p class="text-center" style="color:white;font-size:50px">传感器 2 电压：&nbsp;<span id="voltage2" name="voltage2"></span>
                         V</p>
                     </div>
                 </div>
@@ -212,7 +212,7 @@
                             $("#voltage2").text("?");     
                         }
                     }).fail(function() {
-                        console.log("The was a problem retrieving the data.");
+                        console.log("获取数据时出现问题。");
                     });
                 };
             });
@@ -236,7 +236,7 @@
             $(function() {
                 $('#resetSubmit').click(function() {
                     $.post('/reset', function() {
-                        alert("Min. and Max. reset to 0 for both sensors");
+                        alert("已将两路传感器的最大/最小值重置为 0");
                     }); 
                 });
             });
