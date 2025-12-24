@@ -1,358 +1,412 @@
 <!DOCTYPE html>
-
 <html lang="zh-CN">
-
-    <head>
-  
-        <meta charset="utf-8">
-
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-
-        <!-- Boostrap and jquery link -->
-        <link rel="stylesheet" href="bootstrap.min.css" />
-        <script src="jquery-3.3.1.min.js"></script>       
-        <script src="bootstrap.min.js"></script>  
-                     
-        <title>ANEG 舵面量角器</title>
-
-        <style>
-            body {
-                background-color: #f5f5f5;
-                font-family: 'Microsoft YaHei', Helvetica, Arial, sans-serif;
-            }
-
-            .jumbotron {
-                padding: 30px 20px;
-                text-align: center;
-            }
-
-            .jumbotron h1 {
-                font-size: 72px;
-                margin-bottom: 10px;
-            }
-
-            .jumbotron span {
-                font-size: 36px;
-            }
-
-            .nav-tabs > li > a {
-                font-size: 36px;
-            }
-
-            .metric-card {
-                border-radius: 14px;
-                margin-bottom: 24px;
-                padding: 26px 20px;
-                color: #fff;
-                text-align: center;
-                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            }
-
-            .panel-pink {
-                background: linear-gradient(to right, #ff5db1 0%, #ef017c 100%);
-            }
-
-            .panel-blue {
-                background: linear-gradient(to right, #a9e4f7 0%, #0fb4e7 100%);
-            }
-
-            .metric-title {
-                font-size: 44px;
-                margin-bottom: 12px;
-            }
-
-            .metric-value {
-                font-size: 40px;
-                margin: 0;
-                line-height: 1.4;
-            }
-
-            .section-button {
-                background: linear-gradient(to right, #8f8e8e 0%, #706464 100%);
-                border-radius: 12px;
-                padding: 12px 18px;
-            }
-
-            .section-button p {
-                color: #fff;
-                font-size: 42px;
-                margin: 0;
-            }
-
-            .settings-input,
-            .settings-button {
-                border-radius: 12px;
-                font-size: 40px;
-                margin-bottom: 20px;
-            }
-
-            @media (max-width: 1200px) {
-                .jumbotron h1 {
-                    font-size: 56px;
-                }
-
-                .jumbotron span {
-                    font-size: 30px;
-                }
-
-                .nav-tabs > li > a {
-                    font-size: 30px;
-                }
-            }
-
-            @media (max-width: 768px) {
-                .jumbotron h1 {
-                    font-size: 44px;
-                }
-
-                .jumbotron span {
-                    font-size: 24px;
-                }
-
-                .nav-tabs > li {
-                    width: 33.3%;
-                    text-align: center;
-                }
-
-                .nav-tabs > li > a {
-                    font-size: 24px;
-                    padding: 12px 6px;
-                }
-
-                .metric-card {
-                    padding: 18px 14px;
-                    margin-bottom: 16px;
-                }
-
-                .metric-title {
-                    font-size: 26px;
-                }
-
-                .metric-value {
-                    font-size: 24px;
-                }
-
-                .section-button p,
-                .settings-input,
-                .settings-button,
-                .section-button {
-                    font-size: 24px;
-                }
-
-                .settings-input {
-                    padding: 14px;
-                }
-
-                .settings-button {
-                    padding: 14px;
-                }
-            }
-        </style>
-
-    </head>
-
-    <body>
-
-        <!-- A nice jumbotron for the page header -->
-        <div class="col-lg-12">
-            <div class="jumbotron">
-                <h1>舵面量角器</h1><span>最简单的滑翔机调参方式</span>
-            </div>
-        </div>
-
-        <!-- Navigation bar with measurement, setting and info tabs -->
-        <div class="col-lg-12">    
-            <nav class="navbar navbar-default">
-                <ul class="nav nav-tabs">
-                    <li><a class="nav-item nav-link active" href="#p1" data-toggle="tab">测量</a></li>
-                    <li><a class="nav-item nav-link" href="#p3" data-toggle="tab">设置</a></li>
-                    <li><a class="nav-item nav-link" href="#p4" data-toggle="tab">信息</a></li>
-                </ul>
-            </nav>      
-        </div>
-
-        <div class="tab-content">
-                
-            <!-- Measurement tab with combined layout -->
-            <div class="tab-pane active" id="p1">
-
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="metric-card panel-pink">
-                            <p class="metric-title">主站当前行程 / 角度</p>
-                            <p class="metric-value">行程：<span id="travel1" name="travel1"></span> mm ｜ 角度：<span id="angle1" name="angle1"></span> 度</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="metric-card panel-blue">
-                            <p class="metric-title">Client 当前行程 / 角度</p>
-                            <p class="metric-value">行程：<span id="travel2" name="travel2"></span> mm ｜ 角度：<span id="angle2" name="angle2"></span> 度</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="metric-card panel-pink">
-                            <p class="metric-title">主站最大上偏 / 角度</p>
-                            <p class="metric-value">行程：<span id="maxiTravelSensor1" name="maxiTravelSensor1"></span> mm ｜ 角度：<span id="maxAngleUp" name="maxAngleUp"></span> 度</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="metric-card panel-blue">
-                            <p class="metric-title">Client 最大上偏 / 角度</p>
-                            <p class="metric-value">行程：<span id="maxiTravelSensor2" name="maxiTravelSensor2"></span> mm ｜ 角度：<span id="maxAngleUpClient" name="maxAngleUpClient"></span> 度</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="metric-card panel-pink">
-                            <p class="metric-title">主站最大下偏 / 角度</p>
-                            <p class="metric-value">行程：<span id="miniTravelSensor1" name="miniTravelSensor1"></span> mm ｜ 角度：<span id="maxAngleDown" name="maxAngleDown"></span> 度</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="metric-card panel-blue">
-                            <p class="metric-title">Client 最大下偏 / 角度</p>
-                            <p class="metric-value">行程：<span id="miniTravelSensor2" name="miniTravelSensor2"></span> mm ｜ 角度：<span id="maxAngleDownClient" name="maxAngleDownClient"></span> 度</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col text-center">
-                        <button type="button" class="section-button" 
-                            id="resetSubmit" name="resetSubmit"><p class="text-center">重置最大/最小</p></button>
-                    </div>
-                </div>
-
-            </div>
-                            
-            <!-- setting tab-content -->
-            <div class="tab-pane" id="p3">                
-                <input class="col-lg-12 settings-input" type="number" min="1" step="1" id ="chordValue" name="chordValue" value="50" />
-                                
-                <button class="col-lg-12 settings-button" style="background-color:#33ff00" id="chordSubmit" name="chordSubmit">保存舵弦长度</button>
-            </div>
-            
-            <!-- info tab-content -->
-            <div class="tab-pane" id="p4">      
-
-                <div class="col-lg-12">
-                    <div class="metric-card panel-pink">
-                        <p class="metric-title">传感器 1 电压</p>
-                        <p class="metric-value"><span id="voltage1" name="voltage1"></span> V</p>
-                    </div>
-                </div>
-
-                <div class="col-lg-12">
-                    <div class="metric-card panel-blue">
-                        <p class="metric-title">传感器 2 电压</p>
-                        <p class="metric-value"><span id="voltage2" name="voltage2"></span> V</p>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- This script sent a periodical request to the esp32 http server -->
-        <script>
-            $(function() {
-
-                function setDisplay(selector, value, fallback) {
-                    if (value === undefined || value === null || value === "") {
-                        $(selector).text(fallback);
-                    } else {
-                        $(selector).text(value);
+<head>
+    <meta charset="UTF-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <title>舵面量角器 · ESP MAD 控制台</title>
+                <link rel="stylesheet" href="bootstrap.min.css" />
+                <style>
+                    :root {
+                        color-scheme: light;
                     }
-                }
 
-                setInterval(requestData, 1000);
-                function requestData() {
+                    body {
+                        background: #f5f6fa;
+                        color: #2f3542;
+                        font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+                        font-size: 16px;
+                        line-height: 1.5;
+                    }
 
-                    $.ajax({url:"/sensors",cache:false})
-                    .done(function(data) {
-                        console.log(data);
-                        var obj = JSON.parse(data);
-                        if (data) {
-                            $("#travel1").text(obj.travel1);
-                            $("#travel2").text(obj.travel2);
-                            $("#DeltaTravel").text(obj.DeltaTravel);                                                        
-                            $("#angle1").text(obj.angle1);
-                            $("#angle2").text(obj.angle2);
-                            $("#DeltaAngle").text(obj.DeltaAngle);
-                            setDisplay("#maxiTravelSensor1", obj.maxiTravelSensor1, "--");
-                            setDisplay("#miniTravelSensor1", obj.miniTravelSensor1, "--");
-                            setDisplay("#maxiTravelSensor2", obj.maxiTravelSensor2, "--");
-                            setDisplay("#miniTravelSensor2", obj.miniTravelSensor2, "--");
-                            setDisplay("#maxAngleUp", obj.maxiAngleSensor1, "--");
-                            setDisplay("#maxAngleDown", obj.miniAngleSensor1, "--");
-                            setDisplay("#maxAngleUpClient", obj.maxiAngleSensor2, "--");
-                            setDisplay("#maxAngleDownClient", obj.miniAngleSensor2, "--");
-                            $("#voltage1").text(obj.voltage1) 
-                            $("#voltage2").text(obj.voltage2)          
-                        } else {
-                            $("#travel1").text("?");
-                            $("#travel2").text("?");
-                            $("#DeltaTravel").text("?");                                                        
-                            $("#angle1").text("?");
-                            $("#angle2").text("?");
-                            $("#DeltaAngle").text("?");
-                            $("#maxiTravelSensor1").text("?"); 
-                            $("#miniTravelSensor1").text("?");
-                            $("#maxiTravelSensor2").text("?");
-                            $("#miniTravelSensor2").text("?");
-                            $("#maxAngleUp").text("?");
-                            $("#maxAngleDown").text("?");
-                            $("#maxAngleUpClient").text("?");
-                            $("#maxAngleDownClient").text("?");
-                            $("#voltage1").text("?");       
-                            $("#voltage2").text("?");     
+                    .jumbotron {
+                        background: linear-gradient(135deg, #6159e6 0%, #a26afc 100%);
+                        color: #fff;
+                        border-radius: 20px;
+                        padding: 32px 28px;
+                        margin-bottom: 24px;
+                    }
+
+                    .jumbotron h1 {
+                        font-size: 42px;
+                        margin-bottom: 8px;
+                    }
+
+                    .jumbotron span {
+                        font-size: 20px;
+                        opacity: 0.9;
+                    }
+
+                    .section-heading {
+                        font-size: 26px;
+                        font-weight: 600;
+                        margin-bottom: 14px;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    }
+
+                    .section-heading small {
+                        font-size: 16px;
+                        color: #7b809a;
+                        font-weight: 400;
+                    }
+
+                    .info-section {
+                        margin-bottom: 24px;
+                    }
+
+                    .metric-card {
+                        background: #fff;
+                        border-radius: 18px;
+                        padding: 18px 20px;
+                        box-shadow: 0 10px 24px rgba(15, 22, 56, 0.08);
+                        border: 1px solid rgba(102, 119, 255, 0.07);
+                        transition: transform 0.2s ease, box-shadow 0.2s ease;
+                        height: 100%;
+                    }
+
+                    .metric-card:hover {
+                        transform: translateY(-4px);
+                        box-shadow: 0 20px 40px rgba(15, 22, 56, 0.12);
+                    }
+
+                    .metric-title {
+                        font-size: 18px;
+                        font-weight: 500;
+                        margin-bottom: 6px;
+                        color: #7b809a;
+                    }
+
+                    .metric-value {
+                        font-size: 28px;
+                        font-weight: 600;
+                        margin: 0;
+                        color: #2f3542;
+                        line-height: 1.3;
+                    }
+
+                    .panel-pink {
+                        border-top: 4px solid #ff70b8;
+                    }
+
+                    .panel-blue {
+                        border-top: 4px solid #3c9bff;
+                    }
+
+                    .panel-purple {
+                        border-top: 4px solid #8c7bff;
+                    }
+
+                    .panel-green {
+                        border-top: 4px solid #2ed573;
+                    }
+
+                    .section-button {
+                        background: linear-gradient(120deg, #8f8e8e 0%, #706464 100%);
+                        border-radius: 12px;
+                        padding: 12px 20px;
+                        border: none;
+                        color: #fff;
+                        font-size: 20px;
+                        font-weight: 600;
+                        width: 100%;
+                        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+                    }
+
+                    .settings-input,
+                    .settings-button {
+                        border-radius: 12px;
+                        font-size: 20px;
+                        padding: 14px;
+                        margin-bottom: 12px;
+                    }
+
+                    .settings-button {
+                        background-color: #33ff00;
+                        border: none;
+                        color: #1c1c1c;
+                        font-weight: 600;
+                        transition: transform 0.15s ease;
+                    }
+
+                    .settings-button:active {
+                        transform: scale(0.98);
+                    }
+
+                    .status-pill {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                        border-radius: 999px;
+                        padding: 6px 14px;
+                        font-size: 16px;
+                        color: #fff;
+                        background: #1dd1a1;
+                    }
+
+                    .status-pill i {
+                        width: 10px;
+                        height: 10px;
+                        border-radius: 50%;
+                        background: rgba(255, 255, 255, 0.9);
+                        display: inline-block;
+                    }
+
+                    @media (max-width: 1200px) {
+                        .jumbotron h1 {
+                            font-size: 34px;
                         }
-                    }).fail(function() {
-                        console.log("获取数据时出现问题。");
+
+                        .jumbotron span {
+                            font-size: 18px;
+                        }
+
+                        .metric-value {
+                            font-size: 24px;
+                        }
+                    }
+
+                    @media (max-width: 768px) {
+                        .jumbotron {
+                            padding: 24px 18px;
+                        }
+
+                        .jumbotron h1 {
+                            font-size: 28px;
+                        }
+
+                        .jumbotron span {
+                            font-size: 16px;
+                        }
+
+                        .section-heading {
+                            flex-direction: column;
+                            align-items: flex-start;
+                            font-size: 22px;
+                        }
+
+                        .metric-value {
+                            font-size: 22px;
+                        }
+
+                        .section-button {
+                            font-size: 18px;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container py-4">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="jumbotron text-center shadow-sm">
+                                <h1>舵面量角器</h1>
+                                <span>最简单的滑翔机调参方式</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <section class="info-section">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <h2 class="section-heading">主站（Server）</h2>
+                            <span class="status-pill"><i></i>实时刷新</span>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-lg-6 col-md-12">
+                                <div class="metric-card panel-pink h-100">
+                                    <p class="metric-title">当前行程 / 角度</p>
+                                    <p class="metric-value">行程：<span id="travel1">--</span> mm ｜ 角度：<span id="angle1">--</span> 度</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-12">
+                                <div class="metric-card panel-pink h-100">
+                                    <p class="metric-title">最大上偏 / 角度</p>
+                                    <p class="metric-value">行程：<span id="maxiTravelSensor1">--</span> mm ｜ 角度：<span id="maxAngleUp">--</span> 度</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-12">
+                                <div class="metric-card panel-pink h-100">
+                                    <p class="metric-title">最大下偏 / 角度</p>
+                                    <p class="metric-value">行程：<span id="miniTravelSensor1">--</span> mm ｜ 角度：<span id="maxAngleDown">--</span> 度</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="info-section">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <h2 class="section-heading">Client</h2>
+                            <span class="status-pill" style="background:#00cec9"><i></i>蓝牙链路</span>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-lg-6 col-md-12">
+                                <div class="metric-card panel-blue h-100">
+                                    <p class="metric-title">当前行程 / 角度</p>
+                                    <p class="metric-value">行程：<span id="travel2">--</span> mm ｜ 角度：<span id="angle2">--</span> 度</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-12">
+                                <div class="metric-card panel-blue h-100">
+                                    <p class="metric-title">最大上偏 / 角度</p>
+                                    <p class="metric-value">行程：<span id="maxiTravelSensor2">--</span> mm ｜ 角度：<span id="maxAngleUpClient">--</span> 度</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-12">
+                                <div class="metric-card panel-blue h-100">
+                                    <p class="metric-title">最大下偏 / 角度</p>
+                                    <p class="metric-value">行程：<span id="miniTravelSensor2">--</span> mm ｜ 角度：<span id="maxAngleDownClient">--</span> 度</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="info-section">
+                        <h2 class="section-heading">主站 ↔ Client 对比</h2>
+                        <div class="row g-3">
+                            <div class="col-lg-6 col-md-12">
+                                <div class="metric-card panel-purple h-100">
+                                    <p class="metric-title">行程差值</p>
+                                    <p class="metric-value">Δ 行程：<span id="DeltaTravel">--</span> mm</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-12">
+                                <div class="metric-card panel-purple h-100">
+                                    <p class="metric-title">角度差值</p>
+                                    <p class="metric-value">Δ 角度：<span id="DeltaAngle">--</span> °</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="info-section">
+                        <h2 class="section-heading">快速操作</h2>
+                        <div class="row g-3 align-items-stretch">
+                            <div class="col-lg-6 col-md-12">
+                                <div class="metric-card panel-green h-100">
+                                    <p class="metric-title">舵弦长度（Chord Control Surface）</p>
+                                    <input class="settings-input form-control" type="number" min="1" step="1" id="chordValue" name="chordValue" value="50" />
+                                    <button class="settings-button" id="chordSubmit" name="chordSubmit">保存舵弦长度</button>
+                                    <p class="text-muted mb-0">用于计算角度，建议在修改传感器安装距离后立即更新。</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-12 d-flex">
+                                <div class="metric-card w-100 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <p class="metric-title">传感器校准</p>
+                                        <p class="metric-value" style="font-size:24px;">一键清除最大 / 最小记录值</p>
+                                    </div>
+                                    <button type="button" class="section-button mt-3" id="resetSubmit" name="resetSubmit">重新标定两路传感器</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="info-section">
+                        <h2 class="section-heading">系统信息</h2>
+                        <div class="row g-3">
+                            <div class="col-lg-6 col-md-12">
+                                <div class="metric-card panel-pink h-100">
+                                    <p class="metric-title">传感器 1 电压</p>
+                                    <p class="metric-value"><span id="voltage1">--</span> V</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-12">
+                                <div class="metric-card panel-blue h-100">
+                                    <p class="metric-title">传感器 2 电压</p>
+                                    <p class="metric-value"><span id="voltage2">--</span> V</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <script src="jquery-3.3.1.min.js"></script>
+                <script src="bootstrap.min.js"></script>
+                <script>
+                    $(function () {
+                        const FALLBACK_SYMBOL = "--";
+
+                        function setDisplay(selector, value, fallback) {
+                            const text = value === undefined || value === null || value === "" ? fallback : value;
+                            $(selector).text(text);
+                        }
+
+                        function renderFallback() {
+                            const targets = [
+                                "#travel1", "#travel2", "#angle1", "#angle2",
+                                "#maxiTravelSensor1", "#miniTravelSensor1", "#maxiTravelSensor2", "#miniTravelSensor2",
+                                "#maxAngleUp", "#maxAngleDown", "#maxAngleUpClient", "#maxAngleDownClient",
+                                "#DeltaTravel", "#DeltaAngle", "#voltage1", "#voltage2"
+                            ];
+                            targets.forEach((selector) => $(selector).text(FALLBACK_SYMBOL));
+                        }
+
+                        function requestData() {
+                            $.ajax({ url: "/sensors", cache: false })
+                                .done(function (data) {
+                                    try {
+                                        const obj = typeof data === "string" ? JSON.parse(data) : data;
+                                        if (!obj) {
+                                            renderFallback();
+                                            return;
+                                        }
+
+                                        setDisplay("#travel1", obj.travel1, FALLBACK_SYMBOL);
+                                        setDisplay("#travel2", obj.travel2, FALLBACK_SYMBOL);
+                                        setDisplay("#angle1", obj.angle1, FALLBACK_SYMBOL);
+                                        setDisplay("#angle2", obj.angle2, FALLBACK_SYMBOL);
+
+                                        setDisplay("#maxiTravelSensor1", obj.maxiTravelSensor1, FALLBACK_SYMBOL);
+                                        setDisplay("#miniTravelSensor1", obj.miniTravelSensor1, FALLBACK_SYMBOL);
+                                        setDisplay("#maxiTravelSensor2", obj.maxiTravelSensor2, FALLBACK_SYMBOL);
+                                        setDisplay("#miniTravelSensor2", obj.miniTravelSensor2, FALLBACK_SYMBOL);
+
+                                        setDisplay("#maxAngleUp", obj.maxiAngleSensor1, FALLBACK_SYMBOL);
+                                        setDisplay("#maxAngleDown", obj.miniAngleSensor1, FALLBACK_SYMBOL);
+                                        setDisplay("#maxAngleUpClient", obj.maxiAngleSensor2, FALLBACK_SYMBOL);
+                                        setDisplay("#maxAngleDownClient", obj.miniAngleSensor2, FALLBACK_SYMBOL);
+
+                                        setDisplay("#DeltaTravel", obj.DeltaTravel, FALLBACK_SYMBOL);
+                                        setDisplay("#DeltaAngle", obj.DeltaAngle, FALLBACK_SYMBOL);
+
+                                        setDisplay("#voltage1", obj.voltage1, FALLBACK_SYMBOL);
+                                        setDisplay("#voltage2", obj.voltage2, FALLBACK_SYMBOL);
+                                    } catch (error) {
+                                        console.error("解析传感器数据失败", error);
+                                        renderFallback();
+                                    }
+                                })
+                                .fail(function () {
+                                    console.warn("获取数据时出现问题。");
+                                    renderFallback();
+                                });
+                        }
+
+                        requestData();
+                        setInterval(requestData, 1000);
+
+                        $("#chordSubmit").on("click", function () {
+                            const chordValue = $("#chordValue").val();
+                            $.post("/chord", { chordValue })
+                                .done(function (data) {
+                                    alert(data || "参数已发送");
+                                })
+                                .fail(function () {
+                                    alert("保存舵弦长度时出现问题，请稍后再试。");
+                                });
+                        });
+
+                        $("#resetSubmit").on("click", function () {
+                            $.post("/reset")
+                                .done(function () {
+                                    alert("已将两路传感器的最大/最小值重置为 0");
+                                    renderFallback();
+                                })
+                                .fail(function () {
+                                    alert("发送重置指令失败，请检查网络连接。");
+                                });
+                        });
                     });
-                };
-            });
-        </script>
-
-        <!-- This script deal with the ChordControlSurface value change -->
-        <script>
-            $(function() {
-                $('#chordSubmit').click(function() {
-                    var param = $("#chordValue").val();
-                    $.post('/chord',{chordValue:param}, function(data){
-                        alert(data);
-                    });
-                });  
-            });
-        </script>
-
-
-        <!-- This script deal with the calibration -->
-        <script>
-            $(function() {
-                $('#resetSubmit').click(function() {
-                    $.post('/reset', function() {
-                        alert("已将两路传感器的最大/最小值重置为 0");
-                        $("#maxiTravelSensor1").text("0");
-                        $("#miniTravelSensor1").text("0");
-                        $("#maxAngleUp").text("0");
-                        $("#maxAngleDown").text("0");
-                        $("#maxiTravelSensor2").text("0");
-                        $("#miniTravelSensor2").text("0");
-                        $("#maxAngleUpClient").text("0");
-                        $("#maxAngleDownClient").text("0");
-                    }); 
-                });
-            });
-        </script>
-
-    </body>
-
-</html>
+                </script>
+            </body>
+            </html>

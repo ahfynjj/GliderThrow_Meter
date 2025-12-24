@@ -433,6 +433,117 @@ httpd_uri_t sensor2 = {
 
 };
 
+static const char *task_state_to_string(eTaskState state)
+{
+    switch (state)
+    {
+    case eRunning:
+        return "running";
+    case eReady:
+        return "ready";
+    case eBlocked:
+        return "blocked";
+    case eSuspended:
+        return "suspended";
+    case eDeleted:
+        return "deleted";
+#if (INCLUDE_vTaskSuspend == 1)
+    case eInvalid:
+        return "invalid";
+#endif
+    default:
+        return "unknown";
+    }
+}
+
+esp_err_t runtime_stats_get_handler(httpd_req_t *req)
+{
+    UBaseType_t task_count = uxTaskGetNumberOfTasks();
+    TaskStatus_t *task_status_array = pvPortMalloc(task_count * sizeof(TaskStatus_t));
+
+    if (task_status_array == NULL)
+    {
+        ESP_LOGE(TAG, "Failed to allocate task status array");
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Allocation error");
+        return ESP_FAIL;
+    }
+
+    uint32_t total_run_time = 0;
+    UBaseType_t valid_tasks = uxTaskGetSystemState(task_status_array, task_count, &total_run_time);
+
+    cJSON *root = cJSON_CreateObject();
+    if (root == NULL)
+    {
+        vPortFree(task_status_array);
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "JSON allocation error");
+        return ESP_FAIL;
+    }
+
+    cJSON_AddNumberToObject(root, "total_runtime_ticks", total_run_time);
+    cJSON_AddNumberToObject(root, "tasks_reported", valid_tasks);
+
+    cJSON *tasks = cJSON_AddArrayToObject(root, "tasks");
+    if (tasks == NULL)
+    {
+        cJSON_Delete(root);
+        vPortFree(task_status_array);
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "JSON allocation error");
+        return ESP_FAIL;
+    }
+
+    for (UBaseType_t i = 0; i < valid_tasks; ++i)
+    {
+        const TaskStatus_t *status = &task_status_array[i];
+        cJSON *task_obj = cJSON_CreateObject();
+        if (task_obj == NULL)
+        {
+            continue;
+        }
+
+        double cpu_percent = (total_run_time > 0)
+                                 ? ((double)status->ulRunTimeCounter * 100.0 / (double)total_run_time)
+                                 : 0.0;
+
+        cJSON_AddStringToObject(task_obj, "name", status->pcTaskName);
+        cJSON_AddNumberToObject(task_obj, "runtime_ticks", status->ulRunTimeCounter);
+        cJSON_AddNumberToObject(task_obj, "cpu_percent", cpu_percent);
+        cJSON_AddStringToObject(task_obj, "state", task_state_to_string(status->eCurrentState));
+        cJSON_AddNumberToObject(task_obj, "priority", status->uxCurrentPriority);
+        cJSON_AddNumberToObject(task_obj, "stack_high_water_mark", status->usStackHighWaterMark);
+#if (configNUMBER_OF_CORES > 1)
+        cJSON_AddNumberToObject(task_obj, "core_id", status->xCoreID);
+#else
+        cJSON_AddNumberToObject(task_obj, "core_id", 0);
+#endif
+
+        cJSON_AddItemToArray(tasks, task_obj);
+    }
+
+    vPortFree(task_status_array);
+
+    char *payload = cJSON_PrintUnformatted(root);
+    if (payload == NULL)
+    {
+        cJSON_Delete(root);
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "JSON encoding error");
+        return ESP_FAIL;
+    }
+
+    httpd_resp_set_type(req, "application/json");
+    httpd_resp_send(req, payload, strlen(payload));
+
+    cJSON_free(payload);
+    cJSON_Delete(root);
+
+    return ESP_OK;
+}
+
+httpd_uri_t runtime_stats = {
+    .uri = "/runtime_stats",
+    .method = HTTP_GET,
+    .handler = runtime_stats_get_handler,
+    .user_ctx = NULL};
+
 /**
  *	@fn 	    esp_err_t chord_post_handler (httpd_req_t *req)
  *	@brief 		An HTTP POST handler.
@@ -565,6 +676,8 @@ httpd_handle_t start_webserver(void)
         httpd_register_uri_handler(server, &sensors);
 
         httpd_register_uri_handler(server, &sensor2);
+
+        httpd_register_uri_handler(server, &runtime_stats);
 
         return server;
     }

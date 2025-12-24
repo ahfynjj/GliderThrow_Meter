@@ -7,4 +7,4 @@ COMPONENT_ADD_INCLUDEDIRS=. WebsiteFiles ..
 
 COMPONENT_EMBED_FILES := WebsiteFiles/esp.html WebsiteFiles/bootstrap.min.css WebsiteFiles/bootstrap.min.js WebsiteFiles/jquery-3.3.1.min.js
 
-COMPONENT_EXTRA_INCLUDES= C:/esp-idf/msys32/home/Eliot/esp/GliderThrow_Meter/Includes
+COMPONENT_EXTRA_INCLUDES= D:\GliderThrow_Meter-master\Includes

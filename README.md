@@ -22,4 +22,8 @@ These libraries are in the extra_components directory of the project.
 
 For more information, please read the docs at https://gliderthrow-meter.readthedocs.io/en/latest/
 
+## Monitoring CPU usage
+
+The ESP32-C3 server firmware now exposes real-time FreeRTOS runtime statistics. Once the server has booted and you are connected to its access point, issue an HTTP GET request to `http://192.168.1.1/runtime_stats` (adjust the IP address if you changed the AP settings). The endpoint returns JSON with one entry per task, including its accumulated runtime ticks, stack high-water mark, and the percentage of CPU time consumed since boot. This makes it easy to verify how much CPU is used by `measure_task`, `http_server_task`, `vBattery_task`, or any other application task without attaching a debugger.
+
 Enjoy !
