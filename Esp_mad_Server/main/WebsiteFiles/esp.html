@@ -8,12 +8,148 @@
 
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
         <!-- Boostrap and jquery link -->
         <link rel="stylesheet" href="bootstrap.min.css" />
         <script src="jquery-3.3.1.min.js"></script>       
         <script src="bootstrap.min.js"></script>  
                      
         <title>ANEG 舵面量角器</title>
+
+        <style>
+            body {
+                background-color: #f5f5f5;
+                font-family: 'Microsoft YaHei', Helvetica, Arial, sans-serif;
+            }
+
+            .jumbotron {
+                padding: 30px 20px;
+                text-align: center;
+            }
+
+            .jumbotron h1 {
+                font-size: 72px;
+                margin-bottom: 10px;
+            }
+
+            .jumbotron span {
+                font-size: 36px;
+            }
+
+            .nav-tabs > li > a {
+                font-size: 36px;
+            }
+
+            .metric-card {
+                border-radius: 14px;
+                margin-bottom: 24px;
+                padding: 26px 20px;
+                color: #fff;
+                text-align: center;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            }
+
+            .panel-pink {
+                background: linear-gradient(to right, #ff5db1 0%, #ef017c 100%);
+            }
+
+            .panel-blue {
+                background: linear-gradient(to right, #a9e4f7 0%, #0fb4e7 100%);
+            }
+
+            .metric-title {
+                font-size: 44px;
+                margin-bottom: 12px;
+            }
+
+            .metric-value {
+                font-size: 40px;
+                margin: 0;
+                line-height: 1.4;
+            }
+
+            .section-button {
+                background: linear-gradient(to right, #8f8e8e 0%, #706464 100%);
+                border-radius: 12px;
+                padding: 12px 18px;
+            }
+
+            .section-button p {
+                color: #fff;
+                font-size: 42px;
+                margin: 0;
+            }
+
+            .settings-input,
+            .settings-button {
+                border-radius: 12px;
+                font-size: 40px;
+                margin-bottom: 20px;
+            }
+
+            @media (max-width: 1200px) {
+                .jumbotron h1 {
+                    font-size: 56px;
+                }
+
+                .jumbotron span {
+                    font-size: 30px;
+                }
+
+                .nav-tabs > li > a {
+                    font-size: 30px;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .jumbotron h1 {
+                    font-size: 44px;
+                }
+
+                .jumbotron span {
+                    font-size: 24px;
+                }
+
+                .nav-tabs > li {
+                    width: 33.3%;
+                    text-align: center;
+                }
+
+                .nav-tabs > li > a {
+                    font-size: 24px;
+                    padding: 12px 6px;
+                }
+
+                .metric-card {
+                    padding: 18px 14px;
+                    margin-bottom: 16px;
+                }
+
+                .metric-title {
+                    font-size: 26px;
+                }
+
+                .metric-value {
+                    font-size: 24px;
+                }
+
+                .section-button p,
+                .settings-input,
+                .settings-button,
+                .section-button {
+                    font-size: 24px;
+                }
+
+                .settings-input {
+                    padding: 14px;
+                }
+
+                .settings-button {
+                    padding: 14px;
+                }
+            }
+        </style>
 
     </head>
 
@@ -22,16 +158,15 @@
         <!-- A nice jumbotron for the page header -->
         <div class="col-lg-12">
             <div class="jumbotron">
-                <h1 style="font-size:100px">舵面量角器</h1><span style="font-size:50px">最简单的滑翔机调参方式</span>
+                <h1>舵面量角器</h1><span>最简单的滑翔机调参方式</span>
             </div>
         </div>
 
-        <!-- Navigation bar with three option : Travel, angle and setting -->
+        <!-- Navigation bar with measurement, setting and info tabs -->
         <div class="col-lg-12">    
-            <nav class="navbar navbar-default" style="font-size:50px">
+            <nav class="navbar navbar-default">
                 <ul class="nav nav-tabs">
-                    <li><a class="nav-item nav-link active" href="#p1" data-toggle="tab">行程</a></li>
-                    <li><a class="nav-item nav-link" href="#p2" data-toggle="tab">角度</a></li>
+                    <li><a class="nav-item nav-link active" href="#p1" data-toggle="tab">测量</a></li>
                     <li><a class="nav-item nav-link" href="#p3" data-toggle="tab">设置</a></li>
                     <li><a class="nav-item nav-link" href="#p4" data-toggle="tab">信息</a></li>
                 </ul>
@@ -40,132 +175,84 @@
 
         <div class="tab-content">
                 
-            <!--- Travel is the active tab-content per default -->
-            <div class="tab-pane active" id="p1">     
+            <!-- Measurement tab with combined layout -->
+            <div class="tab-pane active" id="p1">
 
-                <div class="col-lg-12">                
-                    <div style="background:linear-gradient(to right, #8f8e8e 0%,#706464 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">传感器 1</p>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="metric-card panel-pink">
+                            <p class="metric-title">主站当前行程 / 角度</p>
+                            <p class="metric-value">行程：<span id="travel1" name="travel1"></span> mm ｜ 角度：<span id="angle1" name="angle1"></span> 度</p>
+                        </div>
                     </div>
-                </div>             
-
-                <div class="col-lg-12">                
-                    <div style="background:linear-gradient(to right, #ff5db1 0%,#ef017c 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">行程：&nbsp;<span id="travel1" name="travel1"></span>
-                        mm</p>
-                    </div>
-                </div>
-
-                <div class="col-lg-12" >
-                    <div style="background:linear-gradient(to right, #ff5db1 0%,#ef017c 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">最大上偏：&nbsp;<span id="maxiTravelSensor1" name="maxiTravelSensor1"></span>
-                        mm</p>
-                    </div>
-                </div>          
-                
-                <div class="col-lg-12" >
-                    <div style="background:linear-gradient(to right, #ff5db1 0%,#ef017c 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">最大下偏：&nbsp;<span id="miniTravelSensor1" name="miniTravelSensor1"></span>
-                        mm</p>
-                    </div>
-                </div>   
-
-                <br/>
-
-                <div class="col-lg-12">                
-                    <div style="background:linear-gradient(to right, #8f8e8e 0%,#706464 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">传感器 2</p>
+                    <div class="col-lg-6">
+                        <div class="metric-card panel-blue">
+                            <p class="metric-title">Client 当前行程 / 角度</p>
+                            <p class="metric-value">行程：<span id="travel2" name="travel2"></span> mm ｜ 角度：<span id="angle2" name="angle2"></span> 度</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="col-lg-12">
-                    <div  style="background:linear-gradient(to right, #a9e4f7 0%,#0fb4e7 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">行程：&nbsp;<span id="travel2" name="travel2"></span>
-                        mm</p>             
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="metric-card panel-pink">
+                            <p class="metric-title">主站最大上偏 / 角度</p>
+                            <p class="metric-value">行程：<span id="maxiTravelSensor1" name="maxiTravelSensor1"></span> mm ｜ 角度：<span id="maxAngleUp" name="maxAngleUp"></span> 度</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="metric-card panel-blue">
+                            <p class="metric-title">Client 最大上偏 / 角度</p>
+                            <p class="metric-value">行程：<span id="maxiTravelSensor2" name="maxiTravelSensor2"></span> mm ｜ 角度：<span id="maxAngleUpClient" name="maxAngleUpClient"></span> 度</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="col-lg-12">
-                    <div  style="background:linear-gradient(to right, #a9e4f7 0%,#0fb4e7 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">最大上偏：&nbsp;<span id="maxiTravelSensor2" name="maxiTravelSensor2"></span>
-                        mm</p>             
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="metric-card panel-pink">
+                            <p class="metric-title">主站最大下偏 / 角度</p>
+                            <p class="metric-value">行程：<span id="miniTravelSensor1" name="miniTravelSensor1"></span> mm ｜ 角度：<span id="maxAngleDown" name="maxAngleDown"></span> 度</p>
+                        </div>
                     </div>
-                </div>                
-
-                <div class="col-lg-12">
-                    <div  style="background:linear-gradient(to right, #a9e4f7 0%,#0fb4e7 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">最大下偏：&nbsp;<span id="miniTravelSensor2" name="miniTravelSensor2"></span>
-                        mm</p>             
-                    </div>
-                </div>     
-
-                <br/>
-
-                <div class="col-lg-12" >
-                    <div style="background:linear-gradient(to right, #5ef59d 0%,#06d606 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">行程差值：&nbsp;<span id="DeltaTravel" name="DeltaTravel"></span>
-                        mm</p>
+                    <div class="col-lg-6">
+                        <div class="metric-card panel-blue">
+                            <p class="metric-title">Client 最大下偏 / 角度</p>
+                            <p class="metric-value">行程：<span id="miniTravelSensor2" name="miniTravelSensor2"></span> mm ｜ 角度：<span id="maxAngleDownClient" name="maxAngleDownClient"></span> 度</p>
+                        </div>
                     </div>
                 </div>
 
-                <br/>
-                <br/> 
-                <br/>
-
-                <div class="col text-center">                                             
-                    <button type="button" style="background:linear-gradient(to right, #8f8e8e 0%,#706464 100%);border-radius:10px" 
-                    id="resetSubmit" name="resetSubmit"><p class="text-center" style="color:white;font-size:50px">重置最大/最小</p></button>
-                </div>
-
-            </div>
-            
-            <!-- Angle tab-content -->
-            <div class="tab-pane" id="p2">
-
-                <div class="col-lg-12">
-                    <div style="background:linear-gradient(to right, #ff5db1 0%,#ef017c 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">传感器 1 角度：&nbsp;<span id="angle1" name="angle1"></span>
-                        度</p>
+                <div class="row">
+                    <div class="col text-center">
+                        <button type="button" class="section-button" 
+                            id="resetSubmit" name="resetSubmit"><p class="text-center">重置最大/最小</p></button>
                     </div>
                 </div>
-                                
-                <div class="col-lg-12">
-                    <div style="background:linear-gradient(to right, #a9e4f7 0%,#0fb4e7 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">传感器 2 角度：&nbsp;<span id="angle2" name="angle2"></span>
-                        度</p>
-                    </div>
-                </div>
-                                
-                <div class="col-lg-12">               
-                    <div style="background:linear-gradient(to right, #5ef59d 0%,#06d606 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">角度差值：&nbsp;<span id="DeltaAngle" name="DeltaAngle"></span>
-                        度</p>
-                    </div>
-                </div>
-                
+
             </div>
                             
             <!-- setting tab-content -->
             <div class="tab-pane" id="p3">                
-                <input class="col-lg-12" style="border-radius:10px;font-size:50px" type="number" min="1" step="1" id ="chordValue" name="chordValue" value="50" />
+                <input class="col-lg-12 settings-input" type="number" min="1" step="1" id ="chordValue" name="chordValue" value="50" />
                                 
-                <button class="col-lg-12" style="border-radius:10px;font-size:50px;background-color:#33ff00" id="chordSubmit" name="chordSubmit">保存舵弦长度</button>
+                <button class="col-lg-12 settings-button" style="background-color:#33ff00" id="chordSubmit" name="chordSubmit">保存舵弦长度</button>
             </div>
             
             <!-- info tab-content -->
             <div class="tab-pane" id="p4">      
 
                 <div class="col-lg-12">
-                    <div style="background:linear-gradient(to right, #ff5db1 0%,#ef017c 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">传感器 1 电压：&nbsp;<span id="voltage1" name="voltage1"></span>
-                        V</p>
+                    <div class="metric-card panel-pink">
+                        <p class="metric-title">传感器 1 电压</p>
+                        <p class="metric-value"><span id="voltage1" name="voltage1"></span> V</p>
                     </div>
                 </div>
 
                 <div class="col-lg-12">
-                    <div style="background:linear-gradient(to right, #a9e4f7 0%,#0fb4e7 100%);border-radius:10px">
-                        <p class="text-center" style="color:white;font-size:50px">传感器 2 电压：&nbsp;<span id="voltage2" name="voltage2"></span>
-                        V</p>
+                    <div class="metric-card panel-blue">
+                        <p class="metric-title">传感器 2 电压</p>
+                        <p class="metric-value"><span id="voltage2" name="voltage2"></span> V</p>
                     </div>
                 </div>
 
@@ -176,6 +263,14 @@
         <!-- This script sent a periodical request to the esp32 http server -->
         <script>
             $(function() {
+
+                function setDisplay(selector, value, fallback) {
+                    if (value === undefined || value === null || value === "") {
+                        $(selector).text(fallback);
+                    } else {
+                        $(selector).text(value);
+                    }
+                }
 
                 setInterval(requestData, 1000);
                 function requestData() {
@@ -191,10 +286,14 @@
                             $("#angle1").text(obj.angle1);
                             $("#angle2").text(obj.angle2);
                             $("#DeltaAngle").text(obj.DeltaAngle);
-                            $("#maxiTravelSensor1").text(obj.maxiTravelSensor1)
-                            $("#miniTravelSensor1").text(obj.miniTravelSensor1)
-                            $("#maxiTravelSensor2").text(obj.maxiTravelSensor2)
-                            $("#miniTravelSensor2").text(obj.miniTravelSensor2)   
+                            setDisplay("#maxiTravelSensor1", obj.maxiTravelSensor1, "--");
+                            setDisplay("#miniTravelSensor1", obj.miniTravelSensor1, "--");
+                            setDisplay("#maxiTravelSensor2", obj.maxiTravelSensor2, "--");
+                            setDisplay("#miniTravelSensor2", obj.miniTravelSensor2, "--");
+                            setDisplay("#maxAngleUp", obj.maxiAngleSensor1, "--");
+                            setDisplay("#maxAngleDown", obj.miniAngleSensor1, "--");
+                            setDisplay("#maxAngleUpClient", obj.maxiAngleSensor2, "--");
+                            setDisplay("#maxAngleDownClient", obj.miniAngleSensor2, "--");
                             $("#voltage1").text(obj.voltage1) 
                             $("#voltage2").text(obj.voltage2)          
                         } else {
@@ -207,7 +306,11 @@
                             $("#maxiTravelSensor1").text("?"); 
                             $("#miniTravelSensor1").text("?");
                             $("#maxiTravelSensor2").text("?");
-                            $("#miniTravelSensor2").text("?"); 
+                            $("#miniTravelSensor2").text("?");
+                            $("#maxAngleUp").text("?");
+                            $("#maxAngleDown").text("?");
+                            $("#maxAngleUpClient").text("?");
+                            $("#maxAngleDownClient").text("?");
                             $("#voltage1").text("?");       
                             $("#voltage2").text("?");     
                         }
@@ -237,6 +340,14 @@
                 $('#resetSubmit').click(function() {
                     $.post('/reset', function() {
                         alert("已将两路传感器的最大/最小值重置为 0");
+                        $("#maxiTravelSensor1").text("0");
+                        $("#miniTravelSensor1").text("0");
+                        $("#maxAngleUp").text("0");
+                        $("#maxAngleDown").text("0");
+                        $("#maxiTravelSensor2").text("0");
+                        $("#miniTravelSensor2").text("0");
+                        $("#maxAngleUpClient").text("0");
+                        $("#maxAngleDownClient").text("0");
                     }); 
                 });
             });

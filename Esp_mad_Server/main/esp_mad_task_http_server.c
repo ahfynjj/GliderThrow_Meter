@@ -49,6 +49,8 @@
 #include <Esp_mad.h>
 #include <Esp_mad_Globals_Variables.h>
 
+#define SENSOR_JSON_BUF_SIZE 512
+
 /*-----------------------------------------
  *-            LOCALS VARIABLES
  *-----------------------------------------*/
@@ -59,6 +61,11 @@ float maxiTravelSensor1 = 0.0;
 float miniTravelSensor1 = 0.0;
 float maxiTravelSensor2 = 0.0;
 float miniTravelSensor2 = 0.0;
+
+float maxiAngleSensor1 = 0.0;
+float miniAngleSensor1 = 0.0;
+float maxiAngleSensor2 = 0.0;
+float miniAngleSensor2 = 0.0;
 
 float voltage2 = 0.0;
 
@@ -246,9 +253,16 @@ esp_err_t sensors_get_handler(httpd_req_t *req)
         free(buf);
     }
 
-    buf = malloc(250);
+    buf = malloc(SENSOR_JSON_BUF_SIZE);
 
-    memset(buf, 0, sizeof(buf) - 1);
+    if (buf == NULL)
+    {
+        ESP_LOGE(TAG, "Failed to allocate sensor response buffer");
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Allocation error");
+        return ESP_FAIL;
+    }
+
+    memset(buf, 0, SENSOR_JSON_BUF_SIZE);
 
     /*--- Compute Min, Max and Deltas for both sensors ---*/
     DeltaTravel = g_travel - travel2;
@@ -264,13 +278,41 @@ esp_err_t sensors_get_handler(httpd_req_t *req)
     if (travel2 < miniTravelSensor2)
         miniTravelSensor2 = travel2;
 
+    if (g_angle > maxiAngleSensor1)
+    {
+        maxiAngleSensor1 = g_angle;
+    }
+
+    if (g_angle < miniAngleSensor1)
+    {
+        miniAngleSensor1 = g_angle;
+    }
+
+    if (angle2 > maxiAngleSensor2)
+    {
+        maxiAngleSensor2 = angle2;
+    }
+
+    if (angle2 < miniAngleSensor2)
+    {
+        miniAngleSensor2 = angle2;
+    }
+
     /*--- compute voltage in volt ---*/
     voltage1 = g_voltage / 1000.0;
 
     ESP_LOGI(TAG, "voltage1 %f - voltage2 %f", voltage1, voltage2);
 
     /*--- Preparing the buffer request in json format ---*/
-    sprintf(buf, "{\"travel1\":%0.1f,\"travel2\":%0.1f,\"DeltaTravel\":%0.1f,\"angle1\":%0.1f,\"angle2\":%0.1f,\"DeltaAngle\":%0.1f,\"maxiTravelSensor1\":%0.1f,\"miniTravelSensor1\":%0.1f, \"maxiTravelSensor2\":%0.1f, \"miniTravelSensor2\":%0.1f,\"voltage1\":%0.2f, \"voltage2\":%0.2f}", (g_travel < 0 ? (-1 * g_travel) : g_travel), (travel2 < 0 ? (-1 * travel2) : travel2), (DeltaTravel < 0 ? (-1 * DeltaTravel) : DeltaTravel), (g_angle < 0 ? (-1 * g_angle) : g_angle), (angle2 < 0 ? (-1 * angle2) : angle2), (DeltaAngle < 0 ? (-1 * DeltaAngle) : DeltaAngle), (-1 * miniTravelSensor1), maxiTravelSensor1, (-1 * miniTravelSensor2), maxiTravelSensor2, voltage1, voltage2);
+    int len = snprintf(buf, SENSOR_JSON_BUF_SIZE, "{\"travel1\":%0.1f,\"travel2\":%0.1f,\"DeltaTravel\":%0.1f,\"angle1\":%0.1f,\"angle2\":%0.1f,\"DeltaAngle\":%0.1f,\"maxiTravelSensor1\":%0.1f,\"miniTravelSensor1\":%0.1f, \"maxiTravelSensor2\":%0.1f, \"miniTravelSensor2\":%0.1f,\"maxiAngleSensor1\":%0.1f,\"miniAngleSensor1\":%0.1f,\"maxiAngleSensor2\":%0.1f,\"miniAngleSensor2\":%0.1f,\"voltage1\":%0.2f, \"voltage2\":%0.2f}", (g_travel < 0 ? (-1 * g_travel) : g_travel), (travel2 < 0 ? (-1 * travel2) : travel2), (DeltaTravel < 0 ? (-1 * DeltaTravel) : DeltaTravel), (g_angle < 0 ? (-1 * g_angle) : g_angle), (angle2 < 0 ? (-1 * angle2) : angle2), (DeltaAngle < 0 ? (-1 * DeltaAngle) : DeltaAngle), (-1 * miniTravelSensor1), maxiTravelSensor1, (-1 * miniTravelSensor2), maxiTravelSensor2, (maxiAngleSensor1 < 0 ? (-1 * maxiAngleSensor1) : maxiAngleSensor1), (-1 * miniAngleSensor1), (maxiAngleSensor2 < 0 ? (-1 * maxiAngleSensor2) : maxiAngleSensor2), (-1 * miniAngleSensor2), voltage1, voltage2);
+
+    if (len < 0 || len >= SENSOR_JSON_BUF_SIZE)
+    {
+        ESP_LOGE(TAG, "Sensor JSON truncated (len=%d)", len);
+        free(buf);
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "JSON truncated");
+        return ESP_FAIL;
+    }
 
     ESP_LOGI(TAG, "[len = %d]  \n", strlen(buf));
 

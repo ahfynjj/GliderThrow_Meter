@@ -18,38 +18,28 @@
 
 #define AP_WIFI_SSID    "ESP_MAD" 
 
-#define ESP_MAD_BOARD               /* Update depending your ESP32 dev. board. set to ESP_MAD_BOARD developped for the project */
-
-/*--- Boards used for first prototyping ---*/
-#ifdef X_ESP32
-    #define PIN_SDA 15
-    #define PIN_CLK 14
-    #define BLINK_GPIO  GPIO_NUM_13 /* If you prototype with this board, connect a LED on this pin because this board doesn't embark a led in its circuit */
+/*
+ * Board selection: ESP32-C3 only
+ * - Default pins chosen to avoid strapping pins and keep GPIO8 free (often wired to RGB LED on C3 devkits).
+ * - Override PIN_SDA / PIN_CLK / BLINK_GPIO at compile time if你的硬件接线不同。
+ */
+#if CONFIG_IDF_TARGET_ESP32C3
+    #define ESP_MAD_DEFAULT_SDA_GPIO    5
+    #define ESP_MAD_DEFAULT_SCL_GPIO    6
+    #define ESP_MAD_DEFAULT_LED_GPIO    8
+    #define ESP_MAD_DEFAULT_BATT_CH     1
 #endif
 
-#ifdef LOLIN_32_LITE
-    #define PIN_SDA 23
-    #define PIN_CLK 19
-    #define BLINK_GPIO  GPIO_NUM_22
+#ifndef PIN_SDA
+    #define PIN_SDA ESP_MAD_DEFAULT_SDA_GPIO
 #endif
 
-#ifdef LOLIN_32
-    #define PIN_SDA 21
-    #define PIN_CLK 22
-    #define BLINK_GPIO  GPIO_NUM_5
+#ifndef PIN_CLK
+    #define PIN_CLK ESP_MAD_DEFAULT_SCL_GPIO
 #endif
 
-#ifdef WROOVER_KIT
-    #define PIN_SDA 21
-    #define PIN_CLK 22
-    #define BLINK_GPIO  GPIO_NUM_2    
-#endif
-
-/*--- Custom ESP_MAD Board developped for the purpose of the project ---*/
-#ifdef ESP_MAD_BOARD
-    #define PIN_SDA 23
-    #define PIN_CLK 22
-    #define BLINK_GPIO  GPIO_NUM_13
+#ifndef BLINK_GPIO
+    #define BLINK_GPIO  (gpio_num_t)ESP_MAD_DEFAULT_LED_GPIO
 #endif
 
 #endif /* _ESP_MAD_H_ */

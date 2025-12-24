@@ -12,7 +12,9 @@
  *-            INCLUDES        
  *-----------------------------------------*/
 #include <esp_wifi.h>
-#include <esp_event_loop.h>
+#include <esp_event.h>
+#include <esp_netif.h>
+#include <lwip/inet.h>
 #include <esp_log.h>
 #include <esp_system.h>
 #include <nvs_flash.h>
@@ -45,55 +47,45 @@ static const char *TAG="Esp_Client->";
  *	@param[in]	*event : system_event_t event pointer.
  *	@return		ESP_OK
  */
-static esp_err_t event_handler(void *ctx, system_event_t *event)
+static void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
+    (void)arg;
+    (void)event_data;
 
-    switch(event->event_id) 
-	{
+    if (event_base != WIFI_EVENT) {
+        return;
+    }
 
-    	case SYSTEM_EVENT_STA_START:
+    switch (event_id)
+    {
+        case WIFI_EVENT_STA_START:
+            ESP_LOGI(TAG, "WIFI_EVENT_STA_START");
+            ESP_ERROR_CHECK(esp_wifi_connect());
+            break;
 
-        	ESP_LOGI(TAG, "SYSTEM_EVENT_STA_START");
-
-        	ESP_ERROR_CHECK(esp_wifi_connect());
-
-        	break;
-
-    	case SYSTEM_EVENT_STA_GOT_IP:
-        
-            xEventGroupSetBits(wifi_event_group, CONNECTED_BIT);
-
-        	ESP_LOGI(TAG, "SYSTEM_EVENT_STA_GOT_IP");
-
-        	ESP_LOGI(TAG, "Got IP: '%s'",
-
-            ip4addr_ntoa(&event->event_info.got_ip.ip_info.ip));
-
-        	break;
-
-    	case SYSTEM_EVENT_STA_DISCONNECTED:
-
-        	ESP_LOGI(TAG, "SYSTEM_EVENT_STA_DISCONNECTED");
-            
-            /* This is a workaround as ESP32 WiFi libs don't currently
-
-               auto-reassociate. */
-
-        	ESP_ERROR_CHECK(esp_wifi_connect());
-
+        case WIFI_EVENT_STA_DISCONNECTED:
+            ESP_LOGI(TAG, "WIFI_EVENT_STA_DISCONNECTED");
+            ESP_ERROR_CHECK(esp_wifi_connect());
             xEventGroupClearBits(wifi_event_group, CONNECTED_BIT);
+            break;
 
-    	    break;
+        default:
+            break;
+    }
+}
 
-	    default:
+static void ip_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
+{
+    (void)arg;
 
-    	    break;
-
-    } /* edn switch */	
-
-    return ESP_OK;
-
-} /* end event_handler */
+    if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
+    {
+        ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
+        xEventGroupSetBits(wifi_event_group, CONNECTED_BIT);
+        ESP_LOGI(TAG, "IP_EVENT_STA_GOT_IP");
+        ESP_LOGI(TAG, "Got IP: " IPSTR, IP2STR(&event->ip_info.ip));
+    }
+}
 
 
 /**
@@ -104,37 +96,44 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
  */
 static void initialise_wifi(void *arg)
 {
-
-    tcpip_adapter_init();
+    (void)arg;
 
     wifi_event_group = xEventGroupCreate();
 
-    ESP_ERROR_CHECK(esp_event_loop_init(event_handler, NULL));
+    esp_err_t ret = esp_netif_init();
+    if (ret != ESP_OK && ret != ESP_ERR_INVALID_STATE) {
+        ESP_ERROR_CHECK(ret);
+    }
+
+    ret = esp_event_loop_create_default();
+    if (ret != ESP_OK && ret != ESP_ERR_INVALID_STATE) {
+        ESP_ERROR_CHECK(ret);
+    }
+
+    if (esp_netif_create_default_wifi_sta() == NULL) {
+        ESP_ERROR_CHECK(ESP_FAIL);
+    }
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
+
+    ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, NULL));
+    ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &ip_event_handler, NULL));
 
     ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
 
     wifi_config_t wifi_config = {
-
         .sta = {
-
             .ssid = AP_WIFI_SSID,
-
+            .threshold.authmode = WIFI_AUTH_OPEN,
         },
-
     };
 
     ESP_LOGI(TAG, "Setting WiFi configuration SSID %s...", wifi_config.sta.ssid);
 
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-
-    ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config));
-
+    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
     ESP_ERROR_CHECK(esp_wifi_start());
-
 } /* end initialise wifi */
 
 /**
@@ -194,6 +193,12 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt)
         case HTTP_EVENT_DISCONNECTED:
 
             ESP_LOGD(TAG, "HTTP_EVENT_DISCONNECTED");
+
+            break;
+
+        case HTTP_EVENT_REDIRECT:
+
+            ESP_LOGD(TAG, "HTTP_EVENT_REDIRECT");
 
             break;
 
