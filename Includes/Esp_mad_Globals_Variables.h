@@ -15,6 +15,8 @@
 #ifndef  _ESP_MAD_GLOBALS_VARIABLES_H_
 #define _ESP_MAD_GLOBALS_VARIABLES_H_
 
+#include <stdbool.h>
+
 #ifdef DEFINE_VARIABLES
     #define EXTERN /*nothing */
     #define INITIALIZER(...)   = __VA_ARGS__
@@ -28,6 +30,12 @@ EXTERN float g_travel INITIALIZER(0.0);             /* Store the travel measure 
 EXTERN float g_angle INITIALIZER(0.0);              /* Store the angle measure by the MPU6050                           */                           
 EXTERN int g_chordControlSurface INITIALIZER(50);   /* Store the chord of the Control surface in mm. 50 mm by default   */
 EXTERN uint32_t g_voltage INITIALIZER(0);           /* Store the voltage of the battery                                 */
+EXTERN float g_travelZeroOffset INITIALIZER(0.0);   /* Store zero reference for travel1                                 */
+EXTERN float g_travel2ZeroOffset INITIALIZER(0.0);  /* Store zero reference for travel2                                 */
+EXTERN float g_angleZeroOffset INITIALIZER(0.0);    /* Store zero reference for angle1                                  */
+EXTERN float g_angle2ZeroOffset INITIALIZER(0.0);   /* Store zero reference for angle2                                  */
+EXTERN float g_targetAngle INITIALIZER(0.0);        /* Target angle entered from UI                                     */
+EXTERN bool g_targetAngleActive INITIALIZER(false); /* Flag to indicate if target LED feature is active                 */
 
 #endif /* _ESP_MAD_GLOBALS_VARIABLES_H_ */
  

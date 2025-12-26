@@ -24,6 +24,8 @@
 #include <esp_log.h>
 #include <esp_err.h>
 #include "driver/gpio.h"
+#include "led_strip.h"
+#include <math.h>
 #include <Esp_mad.h>
 
 /*-----------------------------------------
@@ -43,6 +45,7 @@ extern "C" {
 
 extern void task_measure(void*);
 extern void task_http_client(void*);
+static void task_target_led(void *ignore);
 
 /**
  *	@fn 	    app_main(void)
@@ -67,6 +70,8 @@ void app_main(void)
     vTaskDelay(500/portTICK_PERIOD_MS);
     
 	xTaskCreate(&task_vBattery, "vBattery_task", 8192, NULL, 5, NULL);
+
+    xTaskCreate(&task_target_led, "target_led_task", 2048, NULL, 4, NULL);
 
 	/*---  Configure the IOMUX register for pad BLINK_GPIO (some pads are ---*/
     /*---  muxed to GPIO on reset already, but some default to other      ---*/
@@ -106,3 +111,130 @@ void app_main(void)
     } /* End while */
 
 } /* end app_main() */
+
+static void task_target_led(void *ignore)
+{
+    static const char *TAG = "target_led";
+
+    led_strip_config_t strip_config = {
+        .strip_gpio_num = TARGET_LED_GPIO,
+        .max_leds = 1,
+        .led_model = LED_MODEL_WS2812,
+        .color_component_format = LED_STRIP_COLOR_COMPONENT_FMT_GRB,
+        .flags = {
+            .invert_out = false,
+        },
+    };
+
+    led_strip_rmt_config_t rmt_config = {
+        .clk_src = RMT_CLK_SRC_DEFAULT,
+        .resolution_hz = 10 * 1000 * 1000,
+        .mem_block_symbols = 64,
+        .flags = {
+            .with_dma = false,
+        },
+    };
+
+    led_strip_handle_t strip;
+    esp_err_t err = led_strip_new_rmt_device(&strip_config, &rmt_config, &strip);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to init led strip: %s", esp_err_to_name(err));
+        vTaskDelete(NULL);
+        return;
+    }
+
+    led_strip_clear(strip);
+
+    enum class target_color
+    {
+        OFF,
+        GREEN,
+        BLUE,
+        CYAN,
+        YELLOW,
+        ORANGE,
+        RED
+    };
+
+    auto apply_color = [&](target_color color)
+    {
+        static target_color last_color = target_color::OFF;
+        if (color == last_color)
+        {
+            return;
+        }
+        last_color = color;
+
+        auto set_pixel = [&](uint8_t r, uint8_t g, uint8_t b)
+        {
+            led_strip_set_pixel(strip, 0, r, g, b);
+            led_strip_refresh(strip);
+        };
+
+        switch (color)
+        {
+            case target_color::OFF:
+                set_pixel(0, 0, 0);
+                break;
+            case target_color::GREEN:
+                set_pixel(0, 64, 0);
+                break;
+            case target_color::BLUE:
+                set_pixel(0, 0, 64);
+                break;
+            case target_color::CYAN:
+                set_pixel(0, 32, 64);
+                break;
+            case target_color::YELLOW:
+                set_pixel(64, 48, 0);
+                break;
+            case target_color::ORANGE:
+                set_pixel(64, 16, 0);
+                break;
+            case target_color::RED:
+                set_pixel(64, 0, 0);
+                break;
+        }
+    };
+
+    while (1)
+    {
+        if (!g_targetAngleActive || !BInit)
+        {
+            apply_color(target_color::OFF);
+            vTaskDelay(pdMS_TO_TICKS(100));
+            continue;
+        }
+
+        float relativeAngle = g_angle - g_angleZeroOffset;
+        float diff = fabsf(relativeAngle - g_targetAngle);
+
+        if (diff <= 0.1f)
+        {
+            apply_color(target_color::GREEN);
+        }
+        else if (diff <= 0.5f)
+        {
+            apply_color(target_color::BLUE);
+        }
+        else if (diff <= 1.0f)
+        {
+            apply_color(target_color::CYAN);
+        }
+        else if (diff <= 2.0f)
+        {
+            apply_color(target_color::YELLOW);
+        }
+        else if (diff <= 5.0f)
+        {
+            apply_color(target_color::ORANGE);
+        }
+        else
+        {
+            apply_color(target_color::RED);
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(50));
+    }
+}

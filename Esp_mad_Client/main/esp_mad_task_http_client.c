@@ -23,10 +23,13 @@
 #include <esp_http_client.h>
 #include <string.h>
 #include <stdlib.h>
+#include <cJSON.h>
 #include <Esp_mad.h>
 #include <Esp_mad_Globals_Variables.h>
 
 /* FreeRTOS event group to signal when we are connected & ready to make a request */
+
+#define SENSOR2_POST_INTERVAL_MS 200
 
 static EventGroupHandle_t wifi_event_group;
 
@@ -280,6 +283,41 @@ void task_http_client(void *ignore)
 
                 esp_http_client_get_content_length(client));
 
+            int status_code = esp_http_client_get_status_code(client);
+            int content_length = esp_http_client_get_content_length(client);
+
+            if (status_code == 200 && content_length > 0)
+            {
+                char response_buf[128];
+                memset(response_buf, 0, sizeof(response_buf));
+                int read_len = esp_http_client_read_response(client, response_buf, sizeof(response_buf) - 1);
+
+                if (read_len >= 0)
+                {
+                    cJSON *resp_json = cJSON_Parse(response_buf);
+                    if (resp_json)
+                    {
+                        const cJSON *target_angle_json = cJSON_GetObjectItemCaseSensitive(resp_json, "targetAngle");
+                        if (cJSON_IsNumber(target_angle_json))
+                        {
+                            g_targetAngle = target_angle_json->valuedouble;
+                        }
+
+                        const cJSON *target_active_json = cJSON_GetObjectItemCaseSensitive(resp_json, "targetActive");
+                        if (cJSON_IsBool(target_active_json))
+                        {
+                            g_targetAngleActive = cJSON_IsTrue(target_active_json);
+                        }
+                        else if (cJSON_IsNumber(target_active_json))
+                        {
+                            g_targetAngleActive = target_active_json->valuedouble > 0.5;
+                        }
+
+                        cJSON_Delete(resp_json);
+                    }
+                }
+            }
+
             } else {
 
             ESP_LOGE(TAG, "HTTP POST request failed: %s", esp_err_to_name(err));
@@ -290,7 +328,7 @@ void task_http_client(void *ignore)
 
         } /* end if uxBits*/  
 
-    vTaskDelay(900/portTICK_PERIOD_MS);
+    vTaskDelay(pdMS_TO_TICKS(SENSOR2_POST_INTERVAL_MS));
 	
     } /* end while() */
 

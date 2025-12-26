@@ -207,6 +207,37 @@
                     </div>
 
                     <section class="info-section">
+                        <h2 class="section-heading">传感器校准 <small>最常用操作</small></h2>
+                        <div class="metric-card panel-green d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                            <div>
+                                <p class="metric-title mb-1">一键清除最大 / 最小记录值</p>
+                                <p class="metric-value" style="font-size:24px;">重新标定两路传感器，立即归零显示</p>
+                            </div>
+                            <div class="w-100" style="max-width:280px;">
+                                <button type="button" class="section-button" id="resetSubmit" name="resetSubmit">重新标定两路传感器</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="info-section">
+                        <h2 class="section-heading">目标角度对准</h2>
+                        <div class="row g-3 align-items-stretch">
+                            <div class="col-lg-8 col-md-12">
+                                <div class="metric-card panel-purple h-100">
+                                    <p class="metric-title">设定目标角度（°）</p>
+                                    <div class="d-flex gap-2 flex-wrap">
+                                        <input class="settings-input form-control flex-grow-1" type="number" step="0.1" id="targetAngleInput" name="targetAngleInput" placeholder="例如 15.0" />
+                                        <button class="settings-button" id="targetAngleSubmit" name="targetAngleSubmit" style="min-width:140px;">保存目标角度</button>
+                                    </div>
+                                    <p class="metric-value mt-2">当前目标：<span id="targetAngleDisplay">--</span> °</p>
+                                    <p class="metric-title">与主站角度差：<span id="targetDiffDisplay">--</span> °</p>
+                                    <p class="text-muted mb-0">LED 提示：≤0.1° 常亮｜0.1-0.5° 10Hz｜0.5-1° 5Hz｜&gt;1° 1Hz</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="info-section">
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
                             <h2 class="section-heading">主站（Server）</h2>
                             <span class="status-pill"><i></i>实时刷新</span>
@@ -216,18 +247,6 @@
                                 <div class="metric-card panel-pink h-100">
                                     <p class="metric-title">当前行程 / 角度</p>
                                     <p class="metric-value">行程：<span id="travel1">--</span> mm ｜ 角度：<span id="angle1">--</span> 度</p>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-md-12">
-                                <div class="metric-card panel-pink h-100">
-                                    <p class="metric-title">最大上偏 / 角度</p>
-                                    <p class="metric-value">行程：<span id="maxiTravelSensor1">--</span> mm ｜ 角度：<span id="maxAngleUp">--</span> 度</p>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-md-12">
-                                <div class="metric-card panel-pink h-100">
-                                    <p class="metric-title">最大下偏 / 角度</p>
-                                    <p class="metric-value">行程：<span id="miniTravelSensor1">--</span> mm ｜ 角度：<span id="maxAngleDown">--</span> 度</p>
                                 </div>
                             </div>
                         </div>
@@ -245,57 +264,18 @@
                                     <p class="metric-value">行程：<span id="travel2">--</span> mm ｜ 角度：<span id="angle2">--</span> 度</p>
                                 </div>
                             </div>
-                            <div class="col-lg-6 col-md-12">
-                                <div class="metric-card panel-blue h-100">
-                                    <p class="metric-title">最大上偏 / 角度</p>
-                                    <p class="metric-value">行程：<span id="maxiTravelSensor2">--</span> mm ｜ 角度：<span id="maxAngleUpClient">--</span> 度</p>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-md-12">
-                                <div class="metric-card panel-blue h-100">
-                                    <p class="metric-title">最大下偏 / 角度</p>
-                                    <p class="metric-value">行程：<span id="miniTravelSensor2">--</span> mm ｜ 角度：<span id="maxAngleDownClient">--</span> 度</p>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section class="info-section">
-                        <h2 class="section-heading">主站 ↔ Client 对比</h2>
-                        <div class="row g-3">
-                            <div class="col-lg-6 col-md-12">
-                                <div class="metric-card panel-purple h-100">
-                                    <p class="metric-title">行程差值</p>
-                                    <p class="metric-value">Δ 行程：<span id="DeltaTravel">--</span> mm</p>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-md-12">
-                                <div class="metric-card panel-purple h-100">
-                                    <p class="metric-title">角度差值</p>
-                                    <p class="metric-value">Δ 角度：<span id="DeltaAngle">--</span> °</p>
-                                </div>
-                            </div>
                         </div>
                     </section>
 
                     <section class="info-section">
                         <h2 class="section-heading">快速操作</h2>
                         <div class="row g-3 align-items-stretch">
-                            <div class="col-lg-6 col-md-12">
+                            <div class="col-lg-8 col-md-12">
                                 <div class="metric-card panel-green h-100">
                                     <p class="metric-title">舵弦长度（Chord Control Surface）</p>
                                     <input class="settings-input form-control" type="number" min="1" step="1" id="chordValue" name="chordValue" value="50" />
                                     <button class="settings-button" id="chordSubmit" name="chordSubmit">保存舵弦长度</button>
                                     <p class="text-muted mb-0">用于计算角度，建议在修改传感器安装距离后立即更新。</p>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-md-12 d-flex">
-                                <div class="metric-card w-100 d-flex flex-column justify-content-between">
-                                    <div>
-                                        <p class="metric-title">传感器校准</p>
-                                        <p class="metric-value" style="font-size:24px;">一键清除最大 / 最小记录值</p>
-                                    </div>
-                                    <button type="button" class="section-button mt-3" id="resetSubmit" name="resetSubmit">重新标定两路传感器</button>
                                 </div>
                             </div>
                         </div>
@@ -325,6 +305,11 @@
                 <script>
                     $(function () {
                         const FALLBACK_SYMBOL = "--";
+                        const POLL_INTERVAL_MS = 200;
+                        const REQUEST_TIMEOUT_MS = 800;
+                        const TARGET_ENDPOINT = "/target_angle";
+                        let pollTimer = null;
+                        let pendingRequest = null;
 
                         function setDisplay(selector, value, fallback) {
                             const text = value === undefined || value === null || value === "" ? fallback : value;
@@ -334,56 +319,74 @@
                         function renderFallback() {
                             const targets = [
                                 "#travel1", "#travel2", "#angle1", "#angle2",
-                                "#maxiTravelSensor1", "#miniTravelSensor1", "#maxiTravelSensor2", "#miniTravelSensor2",
-                                "#maxAngleUp", "#maxAngleDown", "#maxAngleUpClient", "#maxAngleDownClient",
-                                "#DeltaTravel", "#DeltaAngle", "#voltage1", "#voltage2"
+                                "#voltage1", "#voltage2",
+                                "#targetAngleDisplay", "#targetDiffDisplay"
                             ];
                             targets.forEach((selector) => $(selector).text(FALLBACK_SYMBOL));
+                            $("#targetAngleInput").val("");
+                        }
+
+                        function resetCurrentReadingsToZero() {
+                            const zeroTargets = ["#travel1", "#travel2", "#angle1", "#angle2", "#targetDiffDisplay"];
+                            zeroTargets.forEach((selector) => $(selector).text("0"));
+                        }
+
+                        function scheduleNextPoll(delay = POLL_INTERVAL_MS) {
+                            clearTimeout(pollTimer);
+                            pollTimer = setTimeout(requestData, delay);
                         }
 
                         function requestData() {
-                            $.ajax({ url: "/sensors", cache: false })
-                                .done(function (data) {
-                                    try {
-                                        const obj = typeof data === "string" ? JSON.parse(data) : data;
-                                        if (!obj) {
-                                            renderFallback();
-                                            return;
+                            pendingRequest = $.ajax({
+                                url: "/sensors",
+                                cache: false,
+                                dataType: "json",
+                                timeout: REQUEST_TIMEOUT_MS
+                            })
+                                .done(function (obj) {
+                                    if (!obj) {
+                                        renderFallback();
+                                        return;
+                                    }
+
+                                    setDisplay("#travel1", obj.travel1, FALLBACK_SYMBOL);
+                                    setDisplay("#travel2", obj.travel2, FALLBACK_SYMBOL);
+                                    setDisplay("#angle1", obj.angle1, FALLBACK_SYMBOL);
+                                    setDisplay("#angle2", obj.angle2, FALLBACK_SYMBOL);
+
+                                    setDisplay("#voltage1", obj.voltage1, FALLBACK_SYMBOL);
+                                    setDisplay("#voltage2", obj.voltage2, FALLBACK_SYMBOL);
+
+                                    if (obj.targetEnabled) {
+                                        if (typeof obj.targetAngle === "number") {
+                                            setDisplay("#targetAngleDisplay", obj.targetAngle.toFixed(1), FALLBACK_SYMBOL);
+                                            $("#targetAngleInput").attr("placeholder", obj.targetAngle.toFixed(1));
+                                        } else {
+                                            setDisplay("#targetAngleDisplay", FALLBACK_SYMBOL, FALLBACK_SYMBOL);
                                         }
 
-                                        setDisplay("#travel1", obj.travel1, FALLBACK_SYMBOL);
-                                        setDisplay("#travel2", obj.travel2, FALLBACK_SYMBOL);
-                                        setDisplay("#angle1", obj.angle1, FALLBACK_SYMBOL);
-                                        setDisplay("#angle2", obj.angle2, FALLBACK_SYMBOL);
-
-                                        setDisplay("#maxiTravelSensor1", obj.maxiTravelSensor1, FALLBACK_SYMBOL);
-                                        setDisplay("#miniTravelSensor1", obj.miniTravelSensor1, FALLBACK_SYMBOL);
-                                        setDisplay("#maxiTravelSensor2", obj.maxiTravelSensor2, FALLBACK_SYMBOL);
-                                        setDisplay("#miniTravelSensor2", obj.miniTravelSensor2, FALLBACK_SYMBOL);
-
-                                        setDisplay("#maxAngleUp", obj.maxiAngleSensor1, FALLBACK_SYMBOL);
-                                        setDisplay("#maxAngleDown", obj.miniAngleSensor1, FALLBACK_SYMBOL);
-                                        setDisplay("#maxAngleUpClient", obj.maxiAngleSensor2, FALLBACK_SYMBOL);
-                                        setDisplay("#maxAngleDownClient", obj.miniAngleSensor2, FALLBACK_SYMBOL);
-
-                                        setDisplay("#DeltaTravel", obj.DeltaTravel, FALLBACK_SYMBOL);
-                                        setDisplay("#DeltaAngle", obj.DeltaAngle, FALLBACK_SYMBOL);
-
-                                        setDisplay("#voltage1", obj.voltage1, FALLBACK_SYMBOL);
-                                        setDisplay("#voltage2", obj.voltage2, FALLBACK_SYMBOL);
-                                    } catch (error) {
-                                        console.error("解析传感器数据失败", error);
-                                        renderFallback();
+                                        if (typeof obj.targetDiff === "number") {
+                                            setDisplay("#targetDiffDisplay", obj.targetDiff.toFixed(2), FALLBACK_SYMBOL);
+                                        } else {
+                                            setDisplay("#targetDiffDisplay", FALLBACK_SYMBOL, FALLBACK_SYMBOL);
+                                        }
+                                    } else {
+                                        setDisplay("#targetAngleDisplay", FALLBACK_SYMBOL, FALLBACK_SYMBOL);
+                                        setDisplay("#targetDiffDisplay", FALLBACK_SYMBOL, FALLBACK_SYMBOL);
+                                        $("#targetAngleInput").attr("placeholder", "例如 15.0");
                                     }
                                 })
-                                .fail(function () {
-                                    console.warn("获取数据时出现问题。");
+                                .fail(function (_xhr, status) {
+                                    console.warn("获取数据时出现问题：", status);
                                     renderFallback();
+                                })
+                                .always(function () {
+                                    pendingRequest = null;
+                                    scheduleNextPoll();
                                 });
                         }
 
                         requestData();
-                        setInterval(requestData, 1000);
 
                         $("#chordSubmit").on("click", function () {
                             const chordValue = $("#chordValue").val();
@@ -399,11 +402,34 @@
                         $("#resetSubmit").on("click", function () {
                             $.post("/reset")
                                 .done(function () {
-                                    alert("已将两路传感器的最大/最小值重置为 0");
-                                    renderFallback();
+                                    alert("已重新标定，两路传感器读数已归零");
+                                    resetCurrentReadingsToZero();
                                 })
                                 .fail(function () {
                                     alert("发送重置指令失败，请检查网络连接。");
+                                });
+                        });
+
+                        $("#targetAngleSubmit").on("click", function () {
+                            const rawValue = $("#targetAngleInput").val();
+                            const parsedValue = parseFloat(rawValue);
+
+                            if (Number.isNaN(parsedValue)) {
+                                alert("请输入有效的目标角度（数字）");
+                                return;
+                            }
+
+                            $.ajax({
+                                url: TARGET_ENDPOINT,
+                                method: "POST",
+                                contentType: "application/json",
+                                data: JSON.stringify({ targetAngle: parsedValue })
+                            })
+                                .done(function () {
+                                    alert("目标角度已更新，LED 已进入指示模式");
+                                })
+                                .fail(function () {
+                                    alert("目标角度更新失败，请重试");
                                 });
                         });
                     });

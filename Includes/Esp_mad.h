@@ -27,6 +27,7 @@
     #define ESP_MAD_DEFAULT_SDA_GPIO    5
     #define ESP_MAD_DEFAULT_SCL_GPIO    6
     #define ESP_MAD_DEFAULT_LED_GPIO    8
+    #define ESP_MAD_TARGET_LED_GPIO     0
     #define ESP_MAD_DEFAULT_BATT_CH     1
 #endif
 
@@ -40,6 +41,10 @@
 
 #ifndef BLINK_GPIO
     #define BLINK_GPIO  (gpio_num_t)ESP_MAD_DEFAULT_LED_GPIO
+#endif
+
+#ifndef TARGET_LED_GPIO
+    #define TARGET_LED_GPIO  (gpio_num_t)ESP_MAD_TARGET_LED_GPIO
 #endif
 
 #endif /* _ESP_MAD_H_ */

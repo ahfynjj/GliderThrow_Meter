@@ -57,16 +57,6 @@
 float travel2 = 0.0;
 float angle2 = 0.0;
 
-float maxiTravelSensor1 = 0.0;
-float miniTravelSensor1 = 0.0;
-float maxiTravelSensor2 = 0.0;
-float miniTravelSensor2 = 0.0;
-
-float maxiAngleSensor1 = 0.0;
-float miniAngleSensor1 = 0.0;
-float maxiAngleSensor2 = 0.0;
-float miniAngleSensor2 = 0.0;
-
 float voltage2 = 0.0;
 
 extern const uint8_t esp_html_start[] asm("_binary_esp_html_start");
@@ -220,14 +210,19 @@ httpd_uri_t jquery_3_3_1_min_js_uri = {
 esp_err_t sensors_get_handler(httpd_req_t *req)
 {
 
-    char *buf;
+    char buf[SENSOR_JSON_BUF_SIZE];
 
+    char *host_header = NULL;
     size_t buf_len;
 
-    float DeltaTravel;
-    float DeltaAngle;
-
     float voltage1 = 0.0;
+
+    float relativeTravel1;
+    float relativeTravel2;
+    float relativeAngle1;
+    float relativeAngle2;
+    float targetDiff = 0.0f;
+    bool targetEnabled = g_targetAngleActive;
 
     /* Get header value string length and allocate memory for length + 1,
 
@@ -240,62 +235,30 @@ esp_err_t sensors_get_handler(httpd_req_t *req)
     if (buf_len > 1)
     {
 
-        buf = malloc(buf_len);
+        host_header = malloc(buf_len);
 
         /* Copy null terminated value string into buffer */
 
-        if (httpd_req_get_hdr_value_str(req, "Host", buf, buf_len) == ESP_OK)
+        if (host_header && httpd_req_get_hdr_value_str(req, "Host", host_header, buf_len) == ESP_OK)
         {
 
-            ESP_LOGI(TAG, "Found header => Host: %s", buf);
+            ESP_LOGI(TAG, "Found header => Host: %s", host_header);
         }
 
-        free(buf);
+        free(host_header);
     }
 
-    buf = malloc(SENSOR_JSON_BUF_SIZE);
-
-    if (buf == NULL)
-    {
-        ESP_LOGE(TAG, "Failed to allocate sensor response buffer");
-        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Allocation error");
-        return ESP_FAIL;
-    }
-
-    memset(buf, 0, SENSOR_JSON_BUF_SIZE);
+    memset(buf, 0, sizeof(buf));
 
     /*--- Compute Min, Max and Deltas for both sensors ---*/
-    DeltaTravel = g_travel - travel2;
-    DeltaAngle = g_angle - angle2;
+    relativeTravel1 = g_travel - g_travelZeroOffset;
+    relativeTravel2 = travel2 - g_travel2ZeroOffset;
+    relativeAngle1 = g_angle - g_angleZeroOffset;
+    relativeAngle2 = angle2 - g_angle2ZeroOffset;
 
-    if (g_travel > maxiTravelSensor1)
-        maxiTravelSensor1 = g_travel;
-    if (g_travel < miniTravelSensor1)
-        miniTravelSensor1 = g_travel;
-
-    if (travel2 > maxiTravelSensor2)
-        maxiTravelSensor2 = travel2;
-    if (travel2 < miniTravelSensor2)
-        miniTravelSensor2 = travel2;
-
-    if (g_angle > maxiAngleSensor1)
+    if (targetEnabled)
     {
-        maxiAngleSensor1 = g_angle;
-    }
-
-    if (g_angle < miniAngleSensor1)
-    {
-        miniAngleSensor1 = g_angle;
-    }
-
-    if (angle2 > maxiAngleSensor2)
-    {
-        maxiAngleSensor2 = angle2;
-    }
-
-    if (angle2 < miniAngleSensor2)
-    {
-        miniAngleSensor2 = angle2;
+        targetDiff = fabsf(relativeAngle1 - g_targetAngle);
     }
 
     /*--- compute voltage in volt ---*/
@@ -304,26 +267,33 @@ esp_err_t sensors_get_handler(httpd_req_t *req)
     ESP_LOGI(TAG, "voltage1 %f - voltage2 %f", voltage1, voltage2);
 
     /*--- Preparing the buffer request in json format ---*/
-    int len = snprintf(buf, SENSOR_JSON_BUF_SIZE, "{\"travel1\":%0.1f,\"travel2\":%0.1f,\"DeltaTravel\":%0.1f,\"angle1\":%0.1f,\"angle2\":%0.1f,\"DeltaAngle\":%0.1f,\"maxiTravelSensor1\":%0.1f,\"miniTravelSensor1\":%0.1f, \"maxiTravelSensor2\":%0.1f, \"miniTravelSensor2\":%0.1f,\"maxiAngleSensor1\":%0.1f,\"miniAngleSensor1\":%0.1f,\"maxiAngleSensor2\":%0.1f,\"miniAngleSensor2\":%0.1f,\"voltage1\":%0.2f, \"voltage2\":%0.2f}", (g_travel < 0 ? (-1 * g_travel) : g_travel), (travel2 < 0 ? (-1 * travel2) : travel2), (DeltaTravel < 0 ? (-1 * DeltaTravel) : DeltaTravel), (g_angle < 0 ? (-1 * g_angle) : g_angle), (angle2 < 0 ? (-1 * angle2) : angle2), (DeltaAngle < 0 ? (-1 * DeltaAngle) : DeltaAngle), (-1 * miniTravelSensor1), maxiTravelSensor1, (-1 * miniTravelSensor2), maxiTravelSensor2, (maxiAngleSensor1 < 0 ? (-1 * maxiAngleSensor1) : maxiAngleSensor1), (-1 * miniAngleSensor1), (maxiAngleSensor2 < 0 ? (-1 * maxiAngleSensor2) : maxiAngleSensor2), (-1 * miniAngleSensor2), voltage1, voltage2);
+    int len = snprintf(buf, SENSOR_JSON_BUF_SIZE, "{\"travel1\":%0.1f,\"travel2\":%0.1f,\"angle1\":%0.1f,\"angle2\":%0.1f,\"voltage1\":%0.2f, \"voltage2\":%0.2f,\"targetAngle\":%0.2f,\"targetDiff\":%0.2f,\"targetEnabled\":%d}",
+                       relativeTravel1,
+                       relativeTravel2,
+                       relativeAngle1,
+                       relativeAngle2,
+                       voltage1,
+                       voltage2,
+                       g_targetAngle,
+                       targetDiff,
+                       targetEnabled ? 1 : 0);
 
     if (len < 0 || len >= SENSOR_JSON_BUF_SIZE)
     {
         ESP_LOGE(TAG, "Sensor JSON truncated (len=%d)", len);
-        free(buf);
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "JSON truncated");
         return ESP_FAIL;
     }
 
-    ESP_LOGI(TAG, "[len = %d]  \n", strlen(buf));
+    ESP_LOGI(TAG, "[len = %d]  \n", len);
 
     ESP_LOGI(TAG, "json = %s\n", buf);
 
-    httpd_resp_set_type(req, "text/plain");
+    httpd_resp_set_type(req, "application/json");
+    httpd_resp_set_hdr(req, "Cache-Control", "no-store");
 
     /*--- Send the request ---*/
-    httpd_resp_send(req, buf, strlen(buf));
-
-    free(buf);
+    httpd_resp_send(req, buf, len);
 
     ESP_LOGI(TAG, "Exit    ----> sensor_get_handler()\n");
 
@@ -409,13 +379,20 @@ esp_err_t sensor2_post_handler(httpd_req_t *req)
 
         ESP_LOGI(TAG, "angle2 : %.1f - travel2 : %.1f - voltage2 : %.2f\n", angle2, travel2, voltage2);
 
-        /* Send response to the client, by default 200 OK status in the mime type */
-        httpd_resp_send(req, NULL, 0);
-
         remaining -= ret;
     }
 
     ESP_LOGI(TAG, "Exit ----> sensor2_post_handler()\n");
+
+    char response[96];
+    int resp_len = snprintf(response, sizeof(response), "{\"targetAngle\":%0.2f,\"targetActive\":%d}", g_targetAngle, g_targetAngleActive ? 1 : 0);
+    if (resp_len < 0 || resp_len >= (int)sizeof(response))
+    {
+        resp_len = snprintf(response, sizeof(response), "{\"targetAngle\":0.0,\"targetActive\":0}");
+    }
+
+    httpd_resp_set_type(req, "application/json");
+    httpd_resp_send(req, response, resp_len);
 
     return ESP_OK;
 
@@ -428,6 +405,110 @@ httpd_uri_t sensor2 = {
     .method = HTTP_POST,
 
     .handler = sensor2_post_handler,
+
+    .user_ctx = NULL
+
+};
+
+esp_err_t target_angle_post_handler(httpd_req_t *req)
+{
+    char buf[64];
+    int ret;
+    int remaining = req->content_len;
+    int offset = 0;
+
+    ESP_LOGI(TAG, "Entering ----> target_angle_post_handler()\n");
+
+    memset(buf, 0, sizeof(buf));
+
+    while (remaining > 0)
+    {
+        if (offset >= (int)(sizeof(buf) - 1))
+        {
+            httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Payload too large");
+            return ESP_FAIL;
+        }
+
+        ret = httpd_req_recv(req, buf + offset, MIN(remaining, (int)(sizeof(buf) - 1 - offset)));
+        if (ret <= 0)
+        {
+            if (ret == HTTPD_SOCK_ERR_TIMEOUT)
+            {
+                continue;
+            }
+            httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to receive body");
+            return ESP_FAIL;
+        }
+        remaining -= ret;
+        offset += ret;
+    }
+
+    cJSON *root = cJSON_Parse(buf);
+    if (!root)
+    {
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+        return ESP_FAIL;
+    }
+
+    const cJSON *target_angle_value = cJSON_GetObjectItemCaseSensitive(root, "targetAngle");
+    if (!cJSON_IsNumber(target_angle_value))
+    {
+        cJSON_Delete(root);
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "targetAngle missing");
+        return ESP_FAIL;
+    }
+
+    g_targetAngle = target_angle_value->valuedouble;
+    g_targetAngleActive = true;
+
+    cJSON_Delete(root);
+
+    httpd_resp_set_type(req, "application/json");
+    httpd_resp_sendstr(req, "{\"status\":\"ok\"}");
+
+    ESP_LOGI(TAG, "Exit ----> target_angle_post_handler()\n");
+
+    return ESP_OK;
+}
+
+httpd_uri_t target_angle_uri = {
+
+    .uri = "/target_angle",
+
+    .method = HTTP_POST,
+
+    .handler = target_angle_post_handler,
+
+    .user_ctx = NULL
+
+};
+
+esp_err_t reset_post_handler(httpd_req_t *req)
+{
+
+    ESP_LOGI(TAG, "Entering ----> reset_post_handler()\n");
+
+    g_travelZeroOffset = g_travel;
+    g_travel2ZeroOffset = travel2;
+    g_angleZeroOffset = g_angle;
+    g_angle2ZeroOffset = angle2;
+
+    const char *resp = "{\"status\":\"ok\"}";
+    httpd_resp_set_type(req, "application/json");
+    httpd_resp_send(req, resp, strlen(resp));
+
+    ESP_LOGI(TAG, "Exit ----> reset_post_handler()\n");
+
+    return ESP_OK;
+}
+
+httpd_uri_t reset_uri = {
+
+    .uri = "/reset",
+
+    .method = HTTP_POST,
+
+    .handler = reset_post_handler,
 
     .user_ctx = NULL
 
@@ -651,6 +732,7 @@ httpd_handle_t start_webserver(void)
     httpd_handle_t server = NULL;
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+    config.max_uri_handlers = 12;
 
     // Start the httpd server
 
@@ -676,6 +758,10 @@ httpd_handle_t start_webserver(void)
         httpd_register_uri_handler(server, &sensors);
 
         httpd_register_uri_handler(server, &sensor2);
+
+        httpd_register_uri_handler(server, &target_angle_uri);
+
+        httpd_register_uri_handler(server, &reset_uri);
 
         httpd_register_uri_handler(server, &runtime_stats);
 
